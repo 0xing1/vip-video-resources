@@ -309,19 +309,9 @@
       <button class="btn-play" id="btnPlay">▶ 开始播放</button>
     </div>
 
-    <!-- API 解析线路 -->
+    <!-- API 解析线路（由 api-lines.js 动态生成） -->
     <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">选择解析线路：</div>
-    <div class="api-lines" id="apiLines">
-      <span class="api-tag active" data-api="https://jx.m3u8.tv/jiexi/?url=">线路1 通用</span>
-      <span class="api-tag" data-api="https://jx.ppflv.com/?url=">线路2 PPFLV</span>
-      <span class="api-tag" data-api="https://json.pangujiexi.com:12345/json.php?url=">线路3 盘古</span>
-      <span class="api-tag" data-api="https://api.parwix.com:4433/analysis/json/?url=">线路4 Parwix</span>
-      <span class="api-tag" data-api="https://jx.playerjy.com/?url=">线路5 PlayerJY</span>
-      <span class="api-tag" data-api="https://jx.aidouer.net/?url=">线路6 爱豆</span>
-      <span class="api-tag" data-api="https://jx.nnxv.cn/tv.php?url=">线路7 NNXV</span>
-      <span class="api-tag" data-api="https://jx.xmflv.com/?url=">线路8 XMFLV</span>
-      <span class="api-tag" data-api="https://jx.yangtu.tv/?url=">线路9 央途</span>
-    </div>
+    <div class="api-lines" id="apiLines"></div>
 
     <!-- 快速跳转 -->
     <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">快速跳转到视频平台：</div>
@@ -367,6 +357,7 @@
 
 </div>
 
+<script src="api-lines.js"></script>
 <script>
 // ── DOM refs ──
 const urlInput = document.getElementById('urlInput');
@@ -379,13 +370,17 @@ const historyList = document.getElementById('historyList');
 const btnClearHistory = document.getElementById('btnClearHistory');
 
 // ── State ──
-let currentApi = 'https://jx.m3u8.tv/jiexi/?url=';
+let apiList = window.__API_LINES__ || [];
+let currentApi = (apiList[0] && apiList[0].url) || '';
 const HISTORY_KEY = 'vip_video_history';
 const API_KEY = 'vip_video_api';
 
 // ── Init ──
 function init() {
-  // Restore selected API
+  // Render API tags from config file
+  renderApiTags();
+
+  // Restore selected API from localStorage
   const savedApi = localStorage.getItem(API_KEY);
   if (savedApi) {
     currentApi = savedApi;
@@ -423,6 +418,21 @@ function init() {
       play();
     }
   });
+}
+
+// ── Render API tags from api-lines.js ──
+function renderApiTags() {
+  if (!apiList.length) {
+    apiLines.innerHTML = '<span style="color:var(--text-secondary);font-size:12px">暂无可用解析线路</span>';
+    return;
+  }
+  apiLines.innerHTML = apiList.map((line, i) => {
+    const isFirst = i === 0 && !localStorage.getItem(API_KEY);
+    return `<span class="api-tag${isFirst ? ' active' : ''}" data-api="${line.url}">线路${line.id} ${line.name}</span>`;
+  }).join('');
+  if (!localStorage.getItem(API_KEY) && apiList[0]) {
+    currentApi = apiList[0].url;
+  }
 }
 
 // ── Detect platform from URL ──

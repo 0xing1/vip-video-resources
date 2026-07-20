@@ -1,0 +1,13 @@
+// 自动生成，请勿手动编辑
+// 修改 api-lines.json 后运行 update.cmd 重新生成
+window.__API_LINES__ = [
+  {"id": 1, "name": "m3u8.tv",     "url": "https://jx.m3u8.tv/jiexi/?url="},
+  {"id": 2, "name": "ppflv",       "url": "https://jx.ppflv.com/?url="},
+  {"id": 3, "name": "盘古",         "url": "https://json.pangujiexi.com:12345/json.php?url="},
+  {"id": 4, "name": "parwix",      "url": "https://api.parwix.com:4433/analysis/json/?url="},
+  {"id": 5, "name": "playerjy",    "url": "https://jx.playerjy.com/?url="},
+  {"id": 6, "name": "爱豆",         "url": "https://jx.aidouer.net/?url="},
+  {"id": 7, "name": "nnxv",        "url": "https://jx.nnxv.cn/tv.php?url="},
+  {"id": 8, "name": "xmflv",       "url": "https://jx.xmflv.com/?url="},
+  {"id": 9, "name": "央途",         "url": "https://jx.yangtu.tv/?url="}
+];
