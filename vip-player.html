@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIP视频解析 - 免费在线播放</title>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --card: #1a1a2e;
+    --primary: #e94560;
+    --primary-hover: #ff6b81;
+    --text: #eee;
+    --text-secondary: #999;
+    --border: #2a2a3e;
+    --input-bg: #16213e;
+    --success: #2ecc71;
+    --tag-bg: #1f2b3c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #e94560, #ff6b81);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* ── Layout ── */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  /* ── Input Section ── */
+  .input-section {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
+  .input-section h2 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .input-section .subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 18px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .input-row input {
+    flex: 1;
+    min-width: 260px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: var(--input-bg);
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    transition: border-color .25s;
+  }
+  .input-row input:focus {
+    border-color: var(--primary);
+  }
+  .input-row input::placeholder {
+    color: #555;
+  }
+  .btn-play {
+    padding: 14px 32px;
+    border-radius: 12px;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .25s, transform .15s;
+  }
+  .btn-play:hover { background: var(--primary-hover); }
+  .btn-play:active { transform: scale(.97); }
+
+  /* ── API Lines ── */
+  .api-lines {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .api-tag {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--tag-bg);
+    color: var(--text-secondary);
+    transition: all .2s;
+    user-select: none;
+  }
+  .api-tag:hover {
+    border-color: var(--primary);
+    color: var(--text);
+  }
+  .api-tag.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+
+  /* ── Quick Links ── */
+  .quick-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .quick-link {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all .2s;
+  }
+  .quick-link:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  /* ── Player ── */
+  .player-wrapper {
+    background: #000;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    aspect-ratio: 16 / 9;
+  }
+  .player-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  .player-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #444;
+    gap: 12px;
+  }
+  .player-placeholder svg {
+    width: 64px;
+    height: 64px;
+    opacity: .3;
+  }
+
+  /* ── History ── */
+  .history-section {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px 28px;
+    border: 1px solid var(--border);
+  }
+  .history-section h3 {
+    font-size: 16px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: var(--input-bg);
+    font-size: 13px;
+    gap: 10px;
+  }
+  .history-item .url-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-secondary);
+  }
+  .history-item .platform-tag {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    background: var(--primary);
+    color: #fff;
+    white-space: nowrap;
+  }
+  .history-item button {
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 12px;
+    transition: all .2s;
+  }
+  .history-item button:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  .btn-clear {
+    margin-top: 12px;
+    padding: 6px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .btn-clear:hover { color: var(--primary); border-color: var(--primary); }
+
+  /* ── Tips ── */
+  .tips {
+    margin-top: 20px;
+    padding: 16px 20px;
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+  .tips strong { color: var(--text); }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .input-row { flex-direction: column; }
+    .btn-play { width: 100%; text-align: center; }
+    .container { padding: 12px 8px; }
+    .input-section, .history-section { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ Header ═══════════ -->
+<header class="header">
+  <span class="logo">🎬 VIP视频解析</span>
+  <span style="font-size:12px;color:var(--text-secondary)">粘贴链接 → 选择线路 → 免费播放</span>
+</header>
+
+<!-- ═══════════ Main ═══════════ -->
+<div class="container">
+
+  <!-- Input -->
+  <div class="input-section">
+    <h2>📎 粘贴视频链接</h2>
+    <p class="subtitle">支持 腾讯视频 · 爱奇艺 · 优酷 · 芒果TV · B站 · 搜狐 等主流平台</p>
+
+    <div class="input-row">
+      <input
+        id="urlInput"
+        type="text"
+        placeholder="在此粘贴视频播放页链接，例如：https://v.qq.com/x/cover/xxxxx.html"
+        autocomplete="off"
+      />
+      <button class="btn-play" id="btnPlay">▶ 开始播放</button>
+    </div>
+
+    <!-- API 解析线路 -->
+    <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">选择解析线路：</div>
+    <div class="api-lines" id="apiLines">
+      <span class="api-tag active" data-api="https://jx.m3u8.tv/jiexi/?url=">线路1 通用</span>
+      <span class="api-tag" data-api="https://jx.ppflv.com/?url=">线路2 PPFLV</span>
+      <span class="api-tag" data-api="https://json.pangujiexi.com:12345/json.php?url=">线路3 盘古</span>
+      <span class="api-tag" data-api="https://api.parwix.com:4433/analysis/json/?url=">线路4 Parwix</span>
+      <span class="api-tag" data-api="https://jx.playerjy.com/?url=">线路5 PlayerJY</span>
+      <span class="api-tag" data-api="https://jx.aidouer.net/?url=">线路6 爱豆</span>
+      <span class="api-tag" data-api="https://jx.nnxv.cn/tv.php?url=">线路7 NNXV</span>
+      <span class="api-tag" data-api="https://jx.xmflv.com/?url=">线路8 XMFLV</span>
+      <span class="api-tag" data-api="https://jx.yangtu.tv/?url=">线路9 央途</span>
+    </div>
+
+    <!-- 快速跳转 -->
+    <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">快速跳转到视频平台：</div>
+    <div class="quick-links">
+      <a class="quick-link" href="https://v.qq.com" target="_blank" rel="noopener">腾讯视频</a>
+      <a class="quick-link" href="https://www.iqiyi.com" target="_blank" rel="noopener">爱奇艺</a>
+      <a class="quick-link" href="https://www.youku.com" target="_blank" rel="noopener">优酷</a>
+      <a class="quick-link" href="https://www.mgtv.com" target="_blank" rel="noopener">芒果TV</a>
+      <a class="quick-link" href="https://www.bilibili.com" target="_blank" rel="noopener">B站</a>
+      <a class="quick-link" href="https://tv.sohu.com" target="_blank" rel="noopener">搜狐视频</a>
+      <a class="quick-link" href="https://www.pptv.com" target="_blank" rel="noopener">PPTV</a>
+    </div>
+  </div>
+
+  <!-- Player -->
+  <div class="player-wrapper" id="playerWrapper">
+    <div class="player-placeholder" id="playerPlaceholder">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      <span>粘贴视频链接并点击播放</span>
+    </div>
+    <iframe id="playerFrame" style="display:none" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+  </div>
+
+  <!-- History -->
+  <div class="history-section">
+    <h3>🕐 播放历史</h3>
+    <div class="history-list" id="historyList">
+      <div style="color:var(--text-secondary);font-size:13px;padding:8px 0">暂无播放记录</div>
+    </div>
+    <button class="btn-clear" id="btnClearHistory">清空历史</button>
+  </div>
+
+  <!-- Tips -->
+  <div class="tips">
+    <strong>💡 使用说明：</strong><br>
+    1. 打开腾讯视频/爱奇艺/优酷/芒果TV等网站，找到想看的VIP视频，<strong>复制浏览器地址栏的完整链接</strong><br>
+    2. 将链接粘贴到上方输入框，选择合适的解析线路<br>
+    3. 点击"开始播放"，等待解析完成即可免费观看<br>
+    4. 如果某条线路无法播放，请切换其他线路重试<br>
+    <br>
+    <strong>⚠️ 提示：</strong>解析接口来自第三方，如有广告请勿轻信。本项目纯前端静态页面，不收集任何数据。仅供学习交流使用。
+  </div>
+
+</div>
+
+<script>
+// ── DOM refs ──
+const urlInput = document.getElementById('urlInput');
+const btnPlay = document.getElementById('btnPlay');
+const playerWrapper = document.getElementById('playerWrapper');
+const playerPlaceholder = document.getElementById('playerPlaceholder');
+const playerFrame = document.getElementById('playerFrame');
+const apiLines = document.getElementById('apiLines');
+const historyList = document.getElementById('historyList');
+const btnClearHistory = document.getElementById('btnClearHistory');
+
+// ── State ──
+let currentApi = 'https://jx.m3u8.tv/jiexi/?url=';
+const HISTORY_KEY = 'vip_video_history';
+const API_KEY = 'vip_video_api';
+
+// ── Init ──
+function init() {
+  // Restore selected API
+  const savedApi = localStorage.getItem(API_KEY);
+  if (savedApi) {
+    currentApi = savedApi;
+    document.querySelectorAll('.api-tag').forEach(tag => {
+      tag.classList.toggle('active', tag.dataset.api === savedApi);
+    });
+  }
+
+  // Render history
+  renderHistory();
+
+  // Events
+  apiLines.addEventListener('click', e => {
+    const tag = e.target.closest('.api-tag');
+    if (!tag) return;
+    document.querySelectorAll('.api-tag').forEach(t => t.classList.remove('active'));
+    tag.classList.add('active');
+    currentApi = tag.dataset.api;
+    localStorage.setItem(API_KEY, currentApi);
+  });
+
+  btnPlay.addEventListener('click', play);
+  urlInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') play();
+  });
+  btnClearHistory.addEventListener('click', () => {
+    localStorage.removeItem(HISTORY_KEY);
+    renderHistory();
+  });
+
+  historyList.addEventListener('click', e => {
+    const replayBtn = e.target.closest('.replay-btn');
+    if (replayBtn) {
+      urlInput.value = replayBtn.dataset.url;
+      play();
+    }
+  });
+}
+
+// ── Detect platform from URL ──
+function detectPlatform(url) {
+  const map = {
+    'v.qq.com':     '腾讯视频',
+    'iqiyi.com':    '爱奇艺',
+    'iq.com':       '爱奇艺',
+    'youku.com':    '优酷',
+    'mgtv.com':     '芒果TV',
+    'bilibili.com': 'B站',
+    'sohu.com':     '搜狐',
+    'pptv.com':     'PPTV',
+    '1905.com':     '1905',
+    'le.com':       '乐视',
+  };
+  for (const [key, label] of Object.entries(map)) {
+    if (url.includes(key)) return label;
+  }
+  return '未知';
+}
+
+// ── Play ──
+function play() {
+  let url = urlInput.value.trim();
+  if (!url) return alert('请先粘贴视频链接！');
+
+  // Auto-add https if missing
+  if (!/^https?:\/\//i.test(url)) {
+    url = 'https://' + url;
+    urlInput.value = url;
+  }
+
+  const fullUrl = currentApi + encodeURIComponent(url);
+  console.log('解析地址:', fullUrl);
+
+  playerPlaceholder.style.display = 'none';
+  playerFrame.style.display = 'block';
+  playerFrame.src = fullUrl;
+
+  // Save to history
+  saveHistory(url);
+  renderHistory();
+}
+
+// ── History ──
+function saveHistory(url) {
+  const history = getHistory();
+  // Remove duplicate
+  const filtered = history.filter(h => h.url !== url);
+  filtered.unshift({
+    url,
+    platform: detectPlatform(url),
+    time: new Date().toLocaleString('zh-CN'),
+  });
+  // Keep max 20
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(filtered.slice(0, 20)));
+}
+
+function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+  } catch { return []; }
+}
+
+function renderHistory() {
+  const history = getHistory();
+  if (!history.length) {
+    historyList.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:8px 0">暂无播放记录</div>';
+    return;
+  }
+  historyList.innerHTML = history.map((h, i) => `
+    <div class="history-item">
+      <span class="platform-tag">${h.platform}</span>
+      <span class="url-text" title="${escapeHtml(h.url)}">${escapeHtml(h.url)}</span>
+      <span style="font-size:11px;color:#555;white-space:nowrap">${h.time}</span>
+      <button class="replay-btn" data-url="${escapeHtml(h.url)}">重播</button>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Boot ──
+init();
+</script>
+</body>
+</html>

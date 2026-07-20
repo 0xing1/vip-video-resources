@@ -1,0 +1,12 @@
+# 下载的视频文件
+downloads/
+
+# 缓存目录
+cache/
+
+# 工具二进制（需手动下载）
+tools/
+
+# Python 缓存
+__pycache__/
+*.pyc
