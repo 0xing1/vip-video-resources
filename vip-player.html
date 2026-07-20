@@ -1,10 +1,15 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="VIP视频解析-免费在线播放，支持腾讯视频、爱奇艺、优酷、芒果TV、B站等平台">
+<meta name="keywords" content="VIP视频解析,免费看VIP,在线视频解析,视频去广告">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>VIP视频解析 - 免费在线播放</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
 <style>
+  /* ═══════ Theme: Dark (default) ═══════ */
   :root {
     --bg: #0f0f0f;
     --card: #1a1a2e;
@@ -14,8 +19,24 @@
     --text-secondary: #999;
     --border: #2a2a3e;
     --input-bg: #16213e;
-    --success: #2ecc71;
     --tag-bg: #1f2b3c;
+    --shadow: rgba(233,69,96,.35);
+    --overlay: rgba(0,0,0,.5);
+  }
+
+  /* ═══════ Theme: Light ═══════ */
+  [data-theme="light"] {
+    --bg: #f5f5f7;
+    --card: #ffffff;
+    --primary: #e94560;
+    --primary-hover: #ff6b81;
+    --text: #1a1a1a;
+    --text-secondary: #666;
+    --border: #e0e0e6;
+    --input-bg: #f0f0f5;
+    --tag-bg: #e8e8ee;
+    --shadow: rgba(233,69,96,.2);
+    --overlay: rgba(0,0,0,.08);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,18 +46,20 @@
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
+    transition: background .35s, color .35s;
   }
 
   /* ── Header ── */
   .header {
     background: var(--card);
     border-bottom: 1px solid var(--border);
-    padding: 16px 24px;
+    padding: 14px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 12px;
+    transition: background .35s, border .35s;
   }
   .logo {
     font-size: 22px;
@@ -45,6 +68,67 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  /* ── Theme Toggle ── */
+  .theme-toggle {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+  .theme-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .theme-slider {
+    position: absolute;
+    inset: 0;
+    background: #2a2a3e;
+    border-radius: 26px;
+    cursor: pointer;
+    transition: background .3s;
+    border: 1px solid var(--border);
+  }
+  .theme-slider::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    bottom: 2px;
+    background: #ffd500;
+    border-radius: 50%;
+    transition: transform .3s;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .theme-toggle input:checked + .theme-slider {
+    background: #d4e4ff;
+  }
+  .theme-toggle input:checked + .theme-slider::before {
+    transform: translateX(20px);
+    background: #ff9500;
+  }
+  .theme-icon {
+    position: absolute;
+    font-size: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .theme-icon.sun { left: 5px; }
+  .theme-icon.moon { right: 5px; }
 
   /* ── Layout ── */
   .container {
@@ -53,17 +137,49 @@
     padding: 24px 16px;
   }
 
-  /* ── Input Section ── */
-  .input-section {
-    background: var(--card);
-    border-radius: 16px;
-    padding: 28px;
+  /* ═══════ Card Flip Scene ═══════ */
+  .card-scene {
+    perspective: 1200px;
     margin-bottom: 20px;
+  }
+  .card-inner {
+    width: 100%;
+    transition: transform .6s cubic-bezier(.4, 0, .2, 1);
+    transform-style: preserve-3d;
+    position: relative;
+  }
+  .card-inner.flipped {
+    transform: rotateY(180deg);
+  }
+  .card-face {
+    backface-visibility: hidden;
+    border-radius: 16px;
+  }
+  .card-front {
+    background: var(--card);
     border: 1px solid var(--border);
+    transition: background .35s, border .35s;
+  }
+  .card-back {
+    position: absolute;
+    inset: 0;
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .card-scene.flipped-active .card-inner {
+    /* 保持 16:9 占位 */;
+  }
+
+  /* ── Input Section (inside card-front) ── */
+  .input-section {
+    padding: 28px;
+    transition: padding .3s;
   }
   .input-section h2 {
     font-size: 18px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -78,25 +194,56 @@
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    position: relative;
   }
   .input-row input {
     flex: 1;
     min-width: 260px;
-    padding: 14px 18px;
+    padding: 14px 44px 14px 18px;
     border-radius: 12px;
     border: 2px solid var(--border);
     background: var(--input-bg);
     color: var(--text);
     font-size: 15px;
     outline: none;
-    transition: border-color .25s;
+    transition: border-color .25s, background .35s, color .35s;
   }
   .input-row input:focus {
     border-color: var(--primary);
   }
   .input-row input::placeholder {
-    color: #555;
+    color: #888;
   }
+
+  /* ── Clear Button ── */
+  .btn-clear-input {
+    position: absolute;
+    right: 120px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(128,128,128,.25);
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: all .2s;
+    z-index: 2;
+  }
+  .btn-clear-input:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+  .btn-clear-input.visible {
+    display: flex;
+  }
+
   .btn-play {
     padding: 14px 32px;
     border-radius: 12px;
@@ -162,14 +309,14 @@
     color: var(--primary);
   }
 
-  /* ── Player ── */
+  /* ── Player (inside card-back) ── */
   .player-wrapper {
     background: #000;
     border-radius: 16px;
     overflow: hidden;
-    margin-bottom: 20px;
     border: 1px solid var(--border);
     aspect-ratio: 16 / 9;
+    flex: 1;
   }
   .player-wrapper iframe {
     width: 100%;
@@ -191,12 +338,29 @@
     opacity: .3;
   }
 
+  .btn-return {
+    align-self: center;
+    padding: 10px 28px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-return:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
   /* ── History ── */
   .history-section {
     background: var(--card);
     border-radius: 16px;
     padding: 24px 28px;
     border: 1px solid var(--border);
+    transition: background .35s, border .35s;
   }
   .history-section h3 {
     font-size: 16px;
@@ -219,6 +383,7 @@
     background: var(--input-bg);
     font-size: 13px;
     gap: 10px;
+    transition: background .35s;
   }
   .history-item .url-text {
     flex: 1;
@@ -271,6 +436,7 @@
     font-size: 13px;
     color: var(--text-secondary);
     line-height: 1.8;
+    transition: background .35s, border .35s;
   }
   .tips strong { color: var(--text); }
 
@@ -278,8 +444,12 @@
   @media (max-width: 600px) {
     .input-row { flex-direction: column; }
     .btn-play { width: 100%; text-align: center; }
+    .btn-clear-input { right: 12px; }
     .container { padding: 12px 8px; }
     .input-section, .history-section { padding: 16px; }
+    .card-front .input-section { padding: 16px; }
+    .header { padding: 10px 14px; }
+    .header-right span { display: none; }
   }
 </style>
 </head>
@@ -288,51 +458,72 @@
 <!-- ═══════════ Header ═══════════ -->
 <header class="header">
   <span class="logo">🎬 VIP视频解析</span>
-  <span style="font-size:12px;color:var(--text-secondary)">粘贴链接 → 选择线路 → 免费播放</span>
+  <div class="header-right">
+    <span>粘贴链接 → 选择线路 → 免费播放</span>
+    <label class="theme-toggle" title="切换深色/浅色模式">
+      <input type="checkbox" id="themeCheckbox">
+      <span class="theme-slider"></span>
+      <span class="theme-icon sun">☀️</span>
+      <span class="theme-icon moon">🌙</span>
+    </label>
+  </div>
 </header>
 
 <!-- ═══════════ Main ═══════════ -->
 <div class="container">
 
-  <!-- Input -->
-  <div class="input-section">
-    <h2>📎 粘贴视频链接</h2>
-    <p class="subtitle">支持 腾讯视频 · 爱奇艺 · 优酷 · 芒果TV · B站 · 搜狐 等主流平台</p>
+  <!-- Card Flip -->
+  <div class="card-scene" id="cardScene">
+    <div class="card-inner" id="cardInner">
 
-    <div class="input-row">
-      <input
-        id="urlInput"
-        type="text"
-        placeholder="在此粘贴视频播放页链接，例如：https://v.qq.com/x/cover/xxxxx.html"
-        autocomplete="off"
-      />
-      <button class="btn-play" id="btnPlay">▶ 开始播放</button>
+      <!-- ═══ Front: Input ═══ -->
+      <div class="card-face card-front" id="cardFront">
+        <div class="input-section">
+          <h2>📎 粘贴视频链接</h2>
+          <p class="subtitle">支持 腾讯视频 · 爱奇艺 · 优酷 · 芒果TV · B站 · 搜狐 等主流平台</p>
+
+          <div class="input-row">
+            <input
+              id="urlInput"
+              type="text"
+              placeholder="在此粘贴视频播放页链接，例如：https://v.qq.com/x/cover/xxxxx.html"
+              autocomplete="off"
+            />
+            <button class="btn-clear-input" id="btnClearInput" title="清空">✕</button>
+            <button class="btn-play" id="btnPlay">▶ 开始播放</button>
+          </div>
+
+          <!-- API 解析线路（由 api-lines.js 动态生成） -->
+          <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">选择解析线路：</div>
+          <div class="api-lines" id="apiLines"></div>
+
+          <!-- 快速跳转 -->
+          <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">快速跳转到视频平台：</div>
+          <div class="quick-links">
+            <a class="quick-link" href="https://v.qq.com" target="_blank" rel="noopener">腾讯视频</a>
+            <a class="quick-link" href="https://www.iqiyi.com" target="_blank" rel="noopener">爱奇艺</a>
+            <a class="quick-link" href="https://www.youku.com" target="_blank" rel="noopener">优酷</a>
+            <a class="quick-link" href="https://www.mgtv.com" target="_blank" rel="noopener">芒果TV</a>
+            <a class="quick-link" href="https://www.bilibili.com" target="_blank" rel="noopener">B站</a>
+            <a class="quick-link" href="https://tv.sohu.com" target="_blank" rel="noopener">搜狐视频</a>
+            <a class="quick-link" href="https://www.pptv.com" target="_blank" rel="noopener">PPTV</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Back: Player ═══ -->
+      <div class="card-face card-back" id="cardBack">
+        <div class="player-wrapper" id="playerWrapper">
+          <div class="player-placeholder" id="playerPlaceholder">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <span>正在加载播放器...</span>
+          </div>
+          <iframe id="playerFrame" style="display:none" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+        </div>
+        <button class="btn-return" id="btnReturn">↩ 返回首页</button>
+      </div>
+
     </div>
-
-    <!-- API 解析线路（由 api-lines.js 动态生成） -->
-    <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">选择解析线路：</div>
-    <div class="api-lines" id="apiLines"></div>
-
-    <!-- 快速跳转 -->
-    <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">快速跳转到视频平台：</div>
-    <div class="quick-links">
-      <a class="quick-link" href="https://v.qq.com" target="_blank" rel="noopener">腾讯视频</a>
-      <a class="quick-link" href="https://www.iqiyi.com" target="_blank" rel="noopener">爱奇艺</a>
-      <a class="quick-link" href="https://www.youku.com" target="_blank" rel="noopener">优酷</a>
-      <a class="quick-link" href="https://www.mgtv.com" target="_blank" rel="noopener">芒果TV</a>
-      <a class="quick-link" href="https://www.bilibili.com" target="_blank" rel="noopener">B站</a>
-      <a class="quick-link" href="https://tv.sohu.com" target="_blank" rel="noopener">搜狐视频</a>
-      <a class="quick-link" href="https://www.pptv.com" target="_blank" rel="noopener">PPTV</a>
-    </div>
-  </div>
-
-  <!-- Player -->
-  <div class="player-wrapper" id="playerWrapper">
-    <div class="player-placeholder" id="playerPlaceholder">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-      <span>粘贴视频链接并点击播放</span>
-    </div>
-    <iframe id="playerFrame" style="display:none" allowfullscreen allow="autoplay; encrypted-media"></iframe>
   </div>
 
   <!-- History -->
@@ -362,25 +553,50 @@
 // ── DOM refs ──
 const urlInput = document.getElementById('urlInput');
 const btnPlay = document.getElementById('btnPlay');
+const btnClearInput = document.getElementById('btnClearInput');
 const playerWrapper = document.getElementById('playerWrapper');
 const playerPlaceholder = document.getElementById('playerPlaceholder');
 const playerFrame = document.getElementById('playerFrame');
 const apiLines = document.getElementById('apiLines');
 const historyList = document.getElementById('historyList');
 const btnClearHistory = document.getElementById('btnClearHistory');
+const btnReturn = document.getElementById('btnReturn');
+const cardScene = document.getElementById('cardScene');
+const cardInner = document.getElementById('cardInner');
+const cardFront = document.getElementById('cardFront');
+const cardBack = document.getElementById('cardBack');
+const themeCheckbox = document.getElementById('themeCheckbox');
 
 // ── State ──
 let apiList = window.__API_LINES__ || [];
 let currentApi = (apiList[0] && apiList[0].url) || '';
 const HISTORY_KEY = 'vip_video_history';
 const API_KEY = 'vip_video_api';
+const THEME_KEY = 'vip_video_theme';
+const FLIPPED = 'flipped';
 
-// ── Init ──
+// ═══════════ Theme ═══════════
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY) || 'dark';
+  applyTheme(saved);
+  themeCheckbox.checked = (saved === 'light');
+  themeCheckbox.addEventListener('change', () => {
+    const next = themeCheckbox.checked ? 'light' : 'dark';
+    applyTheme(next);
+    localStorage.setItem(THEME_KEY, next);
+  });
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+}
+
+// ═══════════ Init ═══════════
 function init() {
-  // Render API tags from config file
+  initTheme();
   renderApiTags();
 
-  // Restore selected API from localStorage
+  // Restore selected API
   const savedApi = localStorage.getItem(API_KEY);
   if (savedApi) {
     currentApi = savedApi;
@@ -389,10 +605,9 @@ function init() {
     });
   }
 
-  // Render history
   renderHistory();
 
-  // Events
+  // ── API tag click ──
   apiLines.addEventListener('click', e => {
     const tag = e.target.closest('.api-tag');
     if (!tag) return;
@@ -402,10 +617,24 @@ function init() {
     localStorage.setItem(API_KEY, currentApi);
   });
 
+  // ── Play ──
   btnPlay.addEventListener('click', play);
   urlInput.addEventListener('keydown', e => {
     if (e.key === 'Enter') play();
   });
+
+  // ── Clear input ──
+  btnClearInput.addEventListener('click', () => {
+    urlInput.value = '';
+    urlInput.focus();
+    updateClearBtn();
+  });
+  urlInput.addEventListener('input', updateClearBtn);
+
+  // ── Return (flip back) ──
+  btnReturn.addEventListener('click', flipBack);
+
+  // ── History ──
   btnClearHistory.addEventListener('click', () => {
     localStorage.removeItem(HISTORY_KEY);
     renderHistory();
@@ -420,22 +649,47 @@ function init() {
   });
 }
 
-// ── Render API tags from api-lines.js ──
-function renderApiTags() {
-  if (!apiList.length) {
-    apiLines.innerHTML = '<span style="color:var(--text-secondary);font-size:12px">暂无可用解析线路</span>';
-    return;
-  }
-  apiLines.innerHTML = apiList.map((line, i) => {
-    const isFirst = i === 0 && !localStorage.getItem(API_KEY);
-    return `<span class="api-tag${isFirst ? ' active' : ''}" data-api="${line.url}">线路${line.id} ${line.name}</span>`;
-  }).join('');
-  if (!localStorage.getItem(API_KEY) && apiList[0]) {
-    currentApi = apiList[0].url;
+// ═══════════ Clear Button ═══════════
+function updateClearBtn() {
+  if (urlInput.value.trim()) {
+    btnClearInput.classList.add('visible');
+  } else {
+    btnClearInput.classList.remove('visible');
   }
 }
 
-// ── Detect platform from URL ──
+// ═══════════ Card Flip ═══════════
+function flipToPlayer() {
+  // Match back face height to front for smooth flip
+  const frontHeight = cardFront.offsetHeight;
+  cardScene.style.minHeight = frontHeight + 'px';
+  cardBack.style.top = '0';
+  cardBack.style.left = '0';
+  cardBack.style.width = '100%';
+  cardBack.style.height = '100%';
+  cardInner.style.minHeight = frontHeight + 'px';
+
+  // Trigger flip
+  requestAnimationFrame(() => {
+    cardInner.classList.add(FLIPPED);
+  });
+}
+
+function flipBack() {
+  cardInner.classList.remove(FLIPPED);
+  // Stop iframe loading
+  playerFrame.src = '';
+  playerFrame.style.display = 'none';
+  playerPlaceholder.style.display = '';
+
+  // Reset card sizing
+  setTimeout(() => {
+    cardScene.style.minHeight = '';
+    cardInner.style.minHeight = '';
+  }, 650);
+}
+
+// ═══════════ Detect Platform ═══════════
 function detectPlatform(url) {
   const map = {
     'v.qq.com':     '腾讯视频',
@@ -455,40 +709,55 @@ function detectPlatform(url) {
   return '未知';
 }
 
-// ── Play ──
+// ═══════════ Play ═══════════
 function play() {
   let url = urlInput.value.trim();
   if (!url) return alert('请先粘贴视频链接！');
 
-  // Auto-add https if missing
   if (!/^https?:\/\//i.test(url)) {
     url = 'https://' + url;
     urlInput.value = url;
   }
 
   const fullUrl = currentApi + encodeURIComponent(url);
-  console.log('解析地址:', fullUrl);
 
+  // Set up iframe
   playerPlaceholder.style.display = 'none';
   playerFrame.style.display = 'block';
   playerFrame.src = fullUrl;
 
-  // Save to history
+  // Flip card
+  flipToPlayer();
+
+  // Save history
   saveHistory(url);
   renderHistory();
 }
 
-// ── History ──
+// ═══════════ Render API Tags ═══════════
+function renderApiTags() {
+  if (!apiList.length) {
+    apiLines.innerHTML = '<span style="color:var(--text-secondary);font-size:12px">暂无可用解析线路</span>';
+    return;
+  }
+  apiLines.innerHTML = apiList.map((line, i) => {
+    const isFirst = i === 0 && !localStorage.getItem(API_KEY);
+    return `<span class="api-tag${isFirst ? ' active' : ''}" data-api="${line.url}">线路${line.id} ${line.name}</span>`;
+  }).join('');
+  if (!localStorage.getItem(API_KEY) && apiList[0]) {
+    currentApi = apiList[0].url;
+  }
+}
+
+// ═══════════ History ═══════════
 function saveHistory(url) {
   const history = getHistory();
-  // Remove duplicate
   const filtered = history.filter(h => h.url !== url);
   filtered.unshift({
     url,
     platform: detectPlatform(url),
     time: new Date().toLocaleString('zh-CN'),
   });
-  // Keep max 20
   localStorage.setItem(HISTORY_KEY, JSON.stringify(filtered.slice(0, 20)));
 }
 
@@ -508,7 +777,7 @@ function renderHistory() {
     <div class="history-item">
       <span class="platform-tag">${h.platform}</span>
       <span class="url-text" title="${escapeHtml(h.url)}">${escapeHtml(h.url)}</span>
-      <span style="font-size:11px;color:#555;white-space:nowrap">${h.time}</span>
+      <span style="font-size:11px;color:#888;white-space:nowrap">${h.time}</span>
       <button class="replay-btn" data-url="${escapeHtml(h.url)}">重播</button>
     </div>
   `).join('');
@@ -518,7 +787,7 @@ function escapeHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── Boot ──
+// ═══════════ Boot ═══════════
 init();
 </script>
 </body>
