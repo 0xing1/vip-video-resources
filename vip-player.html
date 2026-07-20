@@ -4,12 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="VIP视频解析-免费在线播放，支持腾讯视频、爱奇艺、优酷、芒果TV、B站等平台">
-<meta name="keywords" content="VIP视频解析,免费看VIP,在线视频解析,视频去广告">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>VIP视频解析 - 免费在线播放</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
 <style>
-  /* ═══════ Theme: Dark (default) ═══════ */
   :root {
     --bg: #0f0f0f;
     --card: #1a1a2e;
@@ -21,8 +19,6 @@
     --input-bg: #16213e;
     --tag-bg: #1f2b3c;
   }
-
-  /* ═══════ Theme: Light ═══════ */
   [data-theme="light"] {
     --bg: #f5f5f7;
     --card: #ffffff;
@@ -32,9 +28,7 @@
     --input-bg: #f0f0f5;
     --tag-bg: #e8e8ee;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
     background: var(--bg);
@@ -47,57 +41,38 @@
     background: var(--card);
     border-bottom: 1px solid var(--border);
     padding: 14px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
   }
   .logo {
-    font-size: 22px;
-    font-weight: 700;
+    font-size: 22px; font-weight: 700;
     background: linear-gradient(135deg, #e94560, #ff6b81);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   .header-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 12px;
-    color: var(--text-secondary);
+    display: flex; align-items: center; gap: 12px;
+    font-size: 12px; color: var(--text-secondary);
   }
 
   /* ── Theme Toggle ── */
-  .theme-toggle {
-    position: relative;
-    width: 48px;
-    height: 26px;
-    flex-shrink: 0;
-  }
+  .theme-toggle { position: relative; width: 48px; height: 26px; flex-shrink: 0; }
   .theme-toggle input { opacity: 0; width: 0; height: 0; }
   .theme-slider {
-    position: absolute;
-    inset: 0;
-    background: #2a2a3e;
-    border-radius: 26px;
-    cursor: pointer;
-    transition: background .25s;
+    position: absolute; inset: 0;
+    background: #2a2a3e; border-radius: 26px;
+    cursor: pointer; transition: background .25s;
     border: 1px solid var(--border);
   }
   .theme-slider::before {
-    content: '';
-    position: absolute;
-    width: 20px; height: 20px;
-    left: 3px; bottom: 2px;
-    background: #ffd500;
-    border-radius: 50%;
+    content: ''; position: absolute;
+    width: 20px; height: 20px; left: 3px; bottom: 2px;
+    background: #ffd500; border-radius: 50%;
     transition: transform .25s;
   }
   .theme-toggle input:checked + .theme-slider { background: #d4e4ff; }
   .theme-toggle input:checked + .theme-slider::before {
-    transform: translateX(20px);
-    background: #ff9500;
+    transform: translateX(20px); background: #ff9500;
   }
   .theme-icon {
     position: absolute; font-size: 12px;
@@ -108,247 +83,123 @@
   .theme-icon.moon { right: 5px; }
 
   /* ── Layout ── */
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 24px 16px;
-  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
 
-  /* ═══════ Card Flip ═══════ */
-  .card-scene {
-    margin-bottom: 20px;
-  }
-  .card-inner {
-    width: 100%;
-    position: relative;
-  }
-  .card-inner.ready {
-    transform-style: preserve-3d;
-    transition: transform .5s ease;
-  }
-  .card-inner.flipped {
-    transform: rotateY(180deg);
-  }
-  .card-face {
-    border-radius: 16px;
-  }
-  .card-front {
+  /* ── Input Card ── */
+  .input-card {
     background: var(--card);
     border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
   }
-  .card-back {
-    position: absolute;
-    inset: 0;
-    transform: rotateY(180deg);
-    backface-visibility: hidden;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .card-scene.flipped-active .card-inner {
-    /* ensure smooth rendering */;
-  }
+  .input-card h2 { font-size: 18px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .input-card .subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
 
-  /* ── Input Section ── */
-  .input-section { padding: 28px; }
-  .input-section h2 {
-    font-size: 18px;
-    margin-bottom: 6px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .input-section .subtitle {
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin-bottom: 18px;
-  }
-
-  .input-row {
-    display: flex; gap: 10px; flex-wrap: wrap;
-    position: relative;
-  }
+  .input-row { display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
   .input-row input {
     flex: 1; min-width: 260px;
     padding: 14px 44px 14px 18px;
     border-radius: 12px;
     border: 2px solid var(--border);
-    background: var(--input-bg);
-    color: var(--text);
-    font-size: 15px;
-    outline: none;
+    background: var(--input-bg); color: var(--text);
+    font-size: 15px; outline: none;
     transition: border-color .2s;
   }
   .input-row input:focus { border-color: var(--primary); }
   .input-row input::placeholder { color: #888; }
 
-  /* ── Clear Button ── */
   .btn-clear-input {
-    position: absolute;
-    right: 120px; top: 50%;
+    position: absolute; right: 120px; top: 50%;
     transform: translateY(-50%);
-    width: 28px; height: 28px;
-    border-radius: 50%; border: none;
-    background: rgba(128,128,128,.25);
-    color: var(--text-secondary);
+    width: 28px; height: 28px; border-radius: 50%; border: none;
+    background: rgba(128,128,128,.25); color: var(--text-secondary);
     font-size: 14px; cursor: pointer;
-    display: none;
-    align-items: center; justify-content: center;
+    display: none; align-items: center; justify-content: center;
     line-height: 1; z-index: 2;
   }
   .btn-clear-input:hover { background: var(--primary); color: #fff; }
   .btn-clear-input.visible { display: flex; }
 
   .btn-play {
-    padding: 14px 32px;
-    border-radius: 12px; border: none;
-    background: var(--primary);
-    color: #fff;
-    font-size: 15px; font-weight: 600;
-    cursor: pointer; white-space: nowrap;
+    padding: 14px 32px; border-radius: 12px; border: none;
+    background: var(--primary); color: #fff;
+    font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap;
     transition: background .2s, transform .1s;
   }
   .btn-play:hover { background: var(--primary-hover); }
   .btn-play:active { transform: scale(.97); }
 
   /* ── API Lines ── */
-  .api-lines {
-    margin-top: 18px;
-    display: flex; flex-wrap: wrap; gap: 8px;
-  }
+  .api-lines { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; }
   .api-tag {
-    padding: 6px 14px;
-    border-radius: 20px; font-size: 12px;
-    cursor: pointer;
-    border: 1px solid var(--border);
-    background: var(--tag-bg);
-    color: var(--text-secondary);
-    transition: all .15s;
-    user-select: none;
+    padding: 6px 14px; border-radius: 20px; font-size: 12px;
+    cursor: pointer; border: 1px solid var(--border);
+    background: var(--tag-bg); color: var(--text-secondary);
+    transition: all .15s; user-select: none;
   }
   .api-tag:hover { border-color: var(--primary); color: var(--text); }
-  .api-tag.active {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: #fff;
-  }
+  .api-tag.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
   /* ── Quick Links ── */
-  .quick-links {
-    display: flex; flex-wrap: wrap; gap: 8px;
-    margin-top: 14px;
-  }
+  .quick-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
   .quick-link {
-    padding: 5px 12px;
-    border-radius: 6px; font-size: 12px;
-    background: var(--tag-bg);
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-    text-decoration: none;
+    padding: 5px 12px; border-radius: 6px; font-size: 12px;
+    background: var(--tag-bg); border: 1px solid var(--border);
+    color: var(--text-secondary); text-decoration: none;
     transition: all .15s;
   }
   .quick-link:hover { border-color: var(--primary); color: var(--primary); }
 
-  /* ── Player ── */
-  .player-wrapper {
-    background: #000;
-    border-radius: 16px; overflow: hidden;
-    border: 1px solid var(--border);
-    aspect-ratio: 16 / 9;
-    flex: 1;
-  }
-  .player-wrapper iframe {
-    width: 100%; height: 100%;
-    border: none;
-  }
-  .player-placeholder {
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    height: 100%; color: #444; gap: 12px;
-  }
-  .player-placeholder svg { width: 64px; height: 64px; opacity: .3; }
-
-  .btn-return {
-    align-self: center;
-    padding: 10px 28px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--card);
-    color: var(--text);
-    font-size: 14px; cursor: pointer;
-    transition: border-color .15s, color .15s;
-  }
-  .btn-return:hover { border-color: var(--primary); color: var(--primary); }
-
   /* ── History ── */
   .history-section {
-    background: var(--card);
-    border-radius: 16px;
-    padding: 24px 28px;
-    border: 1px solid var(--border);
+    background: var(--card); border-radius: 16px;
+    padding: 24px 28px; border: 1px solid var(--border);
+    margin-bottom: 20px;
   }
-  .history-section h3 {
-    font-size: 16px;
-    margin-bottom: 14px;
-    display: flex; align-items: center; gap: 8px;
-  }
+  .history-section h3 { font-size: 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
   .history-list { display: flex; flex-direction: column; gap: 6px; }
   .history-item {
-    display: flex; align-items: center;
-    justify-content: space-between;
-    padding: 10px 14px;
-    border-radius: 8px;
-    background: var(--input-bg);
-    font-size: 13px; gap: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; border-radius: 8px;
+    background: var(--input-bg); font-size: 13px; gap: 10px;
   }
   .history-item .url-text {
-    flex: 1; overflow: hidden;
-    text-overflow: ellipsis; white-space: nowrap;
+    flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     color: var(--text-secondary);
   }
   .history-item .platform-tag {
-    padding: 2px 8px; border-radius: 4px;
-    font-size: 11px;
-    background: var(--primary);
-    color: #fff; white-space: nowrap;
+    padding: 2px 8px; border-radius: 4px; font-size: 11px;
+    background: var(--primary); color: #fff; white-space: nowrap;
   }
   .history-item button {
     padding: 4px 12px; border-radius: 6px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-secondary);
-    cursor: pointer; font-size: 12px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text-secondary); cursor: pointer; font-size: 12px;
     transition: border-color .15s, color .15s;
   }
   .history-item button:hover { border-color: var(--primary); color: var(--primary); }
   .btn-clear {
-    margin-top: 12px;
-    padding: 6px 16px; border-radius: 6px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-secondary);
-    cursor: pointer; font-size: 12px;
+    margin-top: 12px; padding: 6px 16px; border-radius: 6px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text-secondary); cursor: pointer; font-size: 12px;
   }
   .btn-clear:hover { color: var(--primary); border-color: var(--primary); }
 
   /* ── Tips ── */
   .tips {
-    margin-top: 20px;
-    padding: 16px 20px;
-    background: var(--card);
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 1.8;
+    padding: 16px 20px; background: var(--card);
+    border-radius: 12px; border: 1px solid var(--border);
+    font-size: 13px; color: var(--text-secondary); line-height: 1.8;
   }
   .tips strong { color: var(--text); }
 
-  /* ── Responsive ── */
   @media (max-width: 600px) {
     .input-row { flex-direction: column; }
     .btn-play { width: 100%; text-align: center; }
     .btn-clear-input { right: 12px; }
     .container { padding: 12px 8px; }
-    .input-section, .history-section { padding: 16px; }
+    .input-card, .history-section { padding: 16px; }
     .header { padding: 10px 14px; }
     .header-right span { display: none; }
   }
@@ -356,7 +207,6 @@
 </head>
 <body>
 
-<!-- ═══════════ Header ═══════════ -->
 <header class="header">
   <span class="logo">🎬 VIP视频解析</span>
   <div class="header-right">
@@ -370,60 +220,36 @@
   </div>
 </header>
 
-<!-- ═══════════ Main ═══════════ -->
 <div class="container">
 
-  <!-- Card Flip -->
-  <div class="card-scene" id="cardScene">
-    <div class="card-inner" id="cardInner">
+  <div class="input-card">
+    <h2>📎 粘贴视频链接</h2>
+    <p class="subtitle">支持 腾讯视频 · 爱奇艺 · 优酷 · 芒果TV · B站 · 搜狐 等主流平台</p>
 
-      <!-- Front: Input -->
-      <div class="card-face card-front" id="cardFront">
-        <div class="input-section">
-          <h2>📎 粘贴视频链接</h2>
-          <p class="subtitle">支持 腾讯视频 · 爱奇艺 · 优酷 · 芒果TV · B站 · 搜狐 等主流平台</p>
+    <div class="input-row">
+      <input id="urlInput" type="text"
+        placeholder="在此粘贴视频播放页链接，例如：https://v.qq.com/x/cover/xxxxx.html"
+        autocomplete="off"
+      />
+      <button class="btn-clear-input" id="btnClearInput" title="清空">✕</button>
+      <button class="btn-play" id="btnPlay">▶ 开始播放</button>
+    </div>
 
-          <div class="input-row">
-            <input id="urlInput" type="text"
-              placeholder="在此粘贴视频播放页链接，例如：https://v.qq.com/x/cover/xxxxx.html"
-              autocomplete="off"
-            />
-            <button class="btn-clear-input" id="btnClearInput" title="清空">✕</button>
-            <button class="btn-play" id="btnPlay">▶ 开始播放</button>
-          </div>
+    <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">选择解析线路：</div>
+    <div class="api-lines" id="apiLines"></div>
 
-          <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">选择解析线路：</div>
-          <div class="api-lines" id="apiLines"></div>
-
-          <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">快速跳转到视频平台：</div>
-          <div class="quick-links">
-            <a class="quick-link" href="https://v.qq.com" target="_blank" rel="noopener">腾讯视频</a>
-            <a class="quick-link" href="https://www.iqiyi.com" target="_blank" rel="noopener">爱奇艺</a>
-            <a class="quick-link" href="https://www.youku.com" target="_blank" rel="noopener">优酷</a>
-            <a class="quick-link" href="https://www.mgtv.com" target="_blank" rel="noopener">芒果TV</a>
-            <a class="quick-link" href="https://www.bilibili.com" target="_blank" rel="noopener">B站</a>
-            <a class="quick-link" href="https://tv.sohu.com" target="_blank" rel="noopener">搜狐视频</a>
-            <a class="quick-link" href="https://www.pptv.com" target="_blank" rel="noopener">PPTV</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Back: Player -->
-      <div class="card-face card-back" id="cardBack">
-        <div class="player-wrapper" id="playerWrapper">
-          <div class="player-placeholder" id="playerPlaceholder">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            <span>正在加载播放器...</span>
-          </div>
-          <iframe id="playerFrame" style="display:none" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-        </div>
-        <button class="btn-return" id="btnReturn">↩ 返回首页</button>
-      </div>
-
+    <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">快速跳转到视频平台：</div>
+    <div class="quick-links">
+      <a class="quick-link" href="https://v.qq.com" target="_blank" rel="noopener">腾讯视频</a>
+      <a class="quick-link" href="https://www.iqiyi.com" target="_blank" rel="noopener">爱奇艺</a>
+      <a class="quick-link" href="https://www.youku.com" target="_blank" rel="noopener">优酷</a>
+      <a class="quick-link" href="https://www.mgtv.com" target="_blank" rel="noopener">芒果TV</a>
+      <a class="quick-link" href="https://www.bilibili.com" target="_blank" rel="noopener">B站</a>
+      <a class="quick-link" href="https://tv.sohu.com" target="_blank" rel="noopener">搜狐视频</a>
+      <a class="quick-link" href="https://www.pptv.com" target="_blank" rel="noopener">PPTV</a>
     </div>
   </div>
 
-  <!-- History -->
   <div class="history-section">
     <h3>🕐 播放历史</h3>
     <div class="history-list" id="historyList">
@@ -432,12 +258,11 @@
     <button class="btn-clear" id="btnClearHistory">清空历史</button>
   </div>
 
-  <!-- Tips -->
   <div class="tips">
     <strong>💡 使用说明：</strong><br>
     1. 打开腾讯视频/爱奇艺/优酷/芒果TV等网站，找到想看的VIP视频，<strong>复制浏览器地址栏的完整链接</strong><br>
     2. 将链接粘贴到上方输入框，选择合适的解析线路<br>
-    3. 点击"开始播放"，等待解析完成即可免费观看<br>
+    3. 点击"开始播放"，会在<strong>新标签页</strong>中打开解析页面<br>
     4. 如果某条线路无法播放，请切换其他线路重试<br>
     <br>
     <strong>⚠️ 提示：</strong>解析接口来自第三方，如有广告请勿轻信。本项目纯前端静态页面，不收集任何数据。仅供学习交流使用。
@@ -447,85 +272,38 @@
 
 <script src="api-lines.js"></script>
 <script>
-// ── DOM refs ──
-const urlInput = document.getElementById('urlInput');
-const btnPlay = document.getElementById('btnPlay');
-const btnClearInput = document.getElementById('btnClearInput');
-const playerPlaceholder = document.getElementById('playerPlaceholder');
-const playerFrame = document.getElementById('playerFrame');
-const apiLines = document.getElementById('apiLines');
-const historyList = document.getElementById('historyList');
-const btnClearHistory = document.getElementById('btnClearHistory');
-const btnReturn = document.getElementById('btnReturn');
-const cardScene = document.getElementById('cardScene');
-const cardInner = document.getElementById('cardInner');
-const cardFront = document.getElementById('cardFront');
-const cardBack = document.getElementById('cardBack');
-const themeCheckbox = document.getElementById('themeCheckbox');
+var urlInput = document.getElementById('urlInput');
+var btnPlay = document.getElementById('btnPlay');
+var btnClearInput = document.getElementById('btnClearInput');
+var apiLines = document.getElementById('apiLines');
+var historyList = document.getElementById('historyList');
+var btnClearHistory = document.getElementById('btnClearHistory');
+var themeCheckbox = document.getElementById('themeCheckbox');
 
-// ── State ──
-let apiList = window.__API_LINES__ || [];
-let currentApi = (apiList[0] && apiList[0].url) || '';
-const HISTORY_KEY = 'vip_video_history';
-const API_KEY = 'vip_video_api';
-const THEME_KEY = 'vip_video_theme';
-const FLIPPED = 'flipped';
+var apiList = window.__API_LINES__ || [];
+var currentApi = (apiList[0] && apiList[0].url) || '';
+var HISTORY_KEY = 'vip_video_history';
+var API_KEY = 'vip_video_api';
+var THEME_KEY = 'vip_video_theme';
 
-// ═══════════ Theme ═══════════
+// ── Theme ──
 function initTheme() {
-  const saved = localStorage.getItem(THEME_KEY) || 'dark';
+  var saved = localStorage.getItem(THEME_KEY) || 'dark';
   applyTheme(saved);
   themeCheckbox.checked = (saved === 'light');
-  themeCheckbox.addEventListener('change', () => {
-    const next = themeCheckbox.checked ? 'light' : 'dark';
+  themeCheckbox.addEventListener('change', function() {
+    var next = themeCheckbox.checked ? 'light' : 'dark';
     applyTheme(next);
     localStorage.setItem(THEME_KEY, next);
   });
 }
+function applyTheme(t) { document.documentElement.setAttribute('data-theme', t); }
 
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-}
-
-// ═══════════ Card Flip ═══════════
-function flipToPlayer() {
-  // Set back face dimensions to match front, then enable 3D
-  var fh = cardFront.offsetHeight;
-  cardScene.style.height = fh + 'px';
-  cardInner.style.height = fh + 'px';
-  cardBack.style.height = fh + 'px';
-
-  // Enable 3D transforms only when needed
-  cardInner.classList.add('ready');
-  cardScene.style.perspective = '1200px';
-
-  requestAnimationFrame(function() {
-    cardInner.classList.add(FLIPPED);
-  });
-}
-
-function flipBack() {
-  cardInner.classList.remove(FLIPPED);
-  playerFrame.src = '';
-  playerFrame.style.display = 'none';
-  playerPlaceholder.style.display = '';
-
-  // Clean up 3D transforms after animation
-  setTimeout(function() {
-    cardInner.classList.remove('ready');
-    cardScene.style.perspective = '';
-    cardScene.style.height = '';
-    cardInner.style.height = '';
-    cardBack.style.height = '';
-  }, 520);
-}
-
-// ═══════════ Init ═══════════
+// ── Init ──
 function init() {
   initTheme();
   renderApiTags();
 
-  // Restore selected API
   var savedApi = localStorage.getItem(API_KEY);
   if (savedApi) {
     currentApi = savedApi;
@@ -537,7 +315,6 @@ function init() {
 
   renderHistory();
 
-  // API tag click
   apiLines.addEventListener('click', function(e) {
     var tag = e.target.closest('.api-tag');
     if (!tag) return;
@@ -548,76 +325,39 @@ function init() {
     localStorage.setItem(API_KEY, currentApi);
   });
 
-  // Play
   btnPlay.addEventListener('click', play);
-  urlInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') play();
-  });
+  urlInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') play(); });
 
-  // Clear input
   btnClearInput.addEventListener('click', function() {
-    urlInput.value = '';
-    urlInput.focus();
-    updateClearBtn();
+    urlInput.value = ''; urlInput.focus(); updateClearBtn();
   });
   urlInput.addEventListener('input', updateClearBtn);
 
-  // Return
-  btnReturn.addEventListener('click', flipBack);
-
-  // History
   btnClearHistory.addEventListener('click', function() {
-    localStorage.removeItem(HISTORY_KEY);
-    renderHistory();
+    localStorage.removeItem(HISTORY_KEY); renderHistory();
   });
 
   historyList.addEventListener('click', function(e) {
-    var replayBtn = e.target.closest('.replay-btn');
-    if (replayBtn) {
-      urlInput.value = replayBtn.dataset.url;
-      play();
-    }
+    var btn = e.target.closest('.replay-btn');
+    if (btn) { urlInput.value = btn.dataset.url; play(); }
   });
 }
 
-// ═══════════ Clear Button ═══════════
 function updateClearBtn() {
   btnClearInput.classList.toggle('visible', !!urlInput.value.trim());
 }
 
-// ═══════════ Detect Platform ═══════════
-function detectPlatform(url) {
-  var map = {
-    'v.qq.com': '腾讯视频', 'iqiyi.com': '爱奇艺', 'iq.com': '爱奇艺',
-    'youku.com': '优酷', 'mgtv.com': '芒果TV', 'bilibili.com': 'B站',
-    'sohu.com': '搜狐', 'pptv.com': 'PPTV', '1905.com': '1905', 'le.com': '乐视'
-  };
-  for (var key in map) {
-    if (url.indexOf(key) !== -1) return map[key];
-  }
-  return '未知';
-}
-
-// ═══════════ Play ═══════════
 function play() {
   var url = urlInput.value.trim();
   if (!url) return alert('请先粘贴视频链接！');
+  if (!/^https?:\/\//i.test(url)) { url = 'https://' + url; urlInput.value = url; }
 
-  if (!/^https?:\/\//i.test(url)) {
-    url = 'https://' + url;
-    urlInput.value = url;
-  }
-
-  playerPlaceholder.style.display = 'none';
-  playerFrame.style.display = 'block';
-  playerFrame.src = currentApi + encodeURIComponent(url);
-
-  flipToPlayer();
+  window.open(currentApi + encodeURIComponent(url), '_blank');
   saveHistory(url);
   renderHistory();
 }
 
-// ═══════════ Render API Tags ═══════════
+// ── API Tags ──
 function renderApiTags() {
   if (!apiList.length) {
     apiLines.innerHTML = '<span style="color:var(--text-secondary);font-size:12px">暂无可用解析线路</span>';
@@ -627,49 +367,45 @@ function renderApiTags() {
     var isFirst = i === 0 && !localStorage.getItem(API_KEY);
     return '<span class="api-tag' + (isFirst ? ' active' : '') + '" data-api="' + line.url + '">线路' + line.id + ' ' + line.name + '</span>';
   }).join('');
-  if (!localStorage.getItem(API_KEY) && apiList[0]) {
-    currentApi = apiList[0].url;
-  }
+  if (!localStorage.getItem(API_KEY) && apiList[0]) currentApi = apiList[0].url;
 }
 
-// ═══════════ History ═══════════
+// ── History ──
+function detectPlatform(url) {
+  var m = { 'v.qq.com':'腾讯视频','iqiyi.com':'爱奇艺','iq.com':'爱奇艺','youku.com':'优酷','mgtv.com':'芒果TV','bilibili.com':'B站','sohu.com':'搜狐','pptv.com':'PPTV','1905.com':'1905','le.com':'乐视' };
+  for (var k in m) { if (url.indexOf(k) !== -1) return m[k]; }
+  return '未知';
+}
+
 function saveHistory(url) {
-  var history = getHistory();
-  var filtered = history.filter(function(h) { return h.url !== url; });
-  filtered.unshift({
-    url: url,
-    platform: detectPlatform(url),
-    time: new Date().toLocaleString('zh-CN')
-  });
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(filtered.slice(0, 20)));
+  var h = getHistory();
+  h = h.filter(function(x) { return x.url !== url; });
+  h.unshift({ url: url, platform: detectPlatform(url), time: new Date().toLocaleString('zh-CN') });
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(0, 20)));
 }
 
 function getHistory() {
-  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
-  catch(e) { return []; }
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch(e) { return []; }
 }
 
 function renderHistory() {
-  var history = getHistory();
-  if (!history.length) {
+  var h = getHistory();
+  if (!h.length) {
     historyList.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:8px 0">暂无播放记录</div>';
     return;
   }
-  historyList.innerHTML = history.map(function(h) {
+  historyList.innerHTML = h.map(function(x) {
     return '<div class="history-item">' +
-      '<span class="platform-tag">' + h.platform + '</span>' +
-      '<span class="url-text" title="' + escapeHtml(h.url) + '">' + escapeHtml(h.url) + '</span>' +
-      '<span style="font-size:11px;color:#888;white-space:nowrap">' + h.time + '</span>' +
-      '<button class="replay-btn" data-url="' + escapeHtml(h.url) + '">重播</button>' +
+      '<span class="platform-tag">' + x.platform + '</span>' +
+      '<span class="url-text" title="' + esc(x.url) + '">' + esc(x.url) + '</span>' +
+      '<span style="font-size:11px;color:#888;white-space:nowrap">' + x.time + '</span>' +
+      '<button class="replay-btn" data-url="' + esc(x.url) + '">重播</button>' +
     '</div>';
   }).join('');
 }
 
-function escapeHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// ═══════════ Boot ═══════════
 init();
 </script>
 </body>
