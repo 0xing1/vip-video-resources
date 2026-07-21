@@ -178,11 +178,10 @@ def main():
 
     log("完成")
     if changed:
-        log(">>> 检测到变更，触发 CI 提交 <<<")
-        sys.exit(10)  # 有变更
+        log(">>> 检测到变更 <<<")
     else:
         log(">>> 无变更 <<<")
-        sys.exit(0)
+    sys.exit(0)
 
 
 if __name__ == "__main__":

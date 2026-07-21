@@ -26,6 +26,7 @@ jobs:
 
       - name: Run auto-update script
         run: python scripts/update.py
+        continue-on-error: true
 
       - name: Check for changes
         id: changes
