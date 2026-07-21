@@ -8,6 +8,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   update:
@@ -45,3 +47,33 @@ jobs:
             git commit -m "🔄 自动更新 API 线路 $(date +'%Y-%m-%d %H:%M')"
             git push
           fi
+
+      # ── Deploy to GitHub Pages ──
+      # 自动更新有变更时部署，手动触发总是部署
+      - name: Determine if deploy needed
+        id: deploy_check
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          elif [ "${{ steps.changes.outputs.has_changes }}" != "0" ]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Prepare deploy directory
+        if: steps.deploy_check.outputs.should_deploy == 'true'
+        run: |
+          mkdir -p _site
+          cp vip-player.html _site/index.html
+          cp api-lines.js _site/
+          cp vip-player.ico _site/ 2>/dev/null || true
+          echo "0xing1.github.io/vip-video-resources" > _site/CNAME 2>/dev/null || true
+
+      - name: Deploy to GitHub Pages
+        if: steps.deploy_check.outputs.should_deploy == 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          force_orphan: true
