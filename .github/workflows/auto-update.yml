@@ -61,6 +61,10 @@ jobs:
             echo "should_deploy=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Setup Pages
+        if: steps.deploy_check.outputs.should_deploy == 'true'
+        uses: actions/configure-pages@v5
+
       - name: Prepare deploy directory
         if: steps.deploy_check.outputs.should_deploy == 'true'
         run: |
@@ -68,12 +72,13 @@ jobs:
           cp vip-player.html _site/index.html
           cp api-lines.js _site/
           cp vip-player.ico _site/ 2>/dev/null || true
-          echo "0xing1.github.io/vip-video-resources" > _site/CNAME 2>/dev/null || true
+
+      - name: Upload Pages artifact
+        if: steps.deploy_check.outputs.should_deploy == 'true'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./_site
 
       - name: Deploy to GitHub Pages
         if: steps.deploy_check.outputs.should_deploy == 'true'
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_site
-          force_orphan: true
+        uses: actions/deploy-pages@v4
