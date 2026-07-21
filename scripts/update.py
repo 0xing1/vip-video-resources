@@ -100,7 +100,6 @@ def step3_merge_and_generate(upstream_lines: list[dict]) -> bool:
     log("[3/4] 合并 & 生成 api-lines.js …")
 
     data = load_json()
-    existing_urls = {line["url"] for line in data["lines"]}
     new_count = 0
 
     for ul in upstream_lines:
@@ -118,30 +117,24 @@ def step3_merge_and_generate(upstream_lines: list[dict]) -> bool:
     else:
         log("  无新线路")
 
-    # 重新生成 api-lines.js
-    old_js = ""
-    if os.path.exists(JS_PATH):
-        with open(JS_PATH, "r", encoding="utf-8") as f:
-            old_js = f.read()
-
-    lines_json = ",\n".join(
-        f'  {{"id": {l["id"]}, "name": "{l["name"]}", "url": "{l["url"]}"}}'
-        for l in data["lines"]
-    )
-    new_js = (
-        f"// auto-generated {datetime.now().strftime('%Y-%m-%d %H:%M')}\n"
-        f"// edit api-lines.json, then run update.cmd or scripts/update.py\n"
-        f"window.__API_LINES__ = [\n{lines_json}\n];\n"
-    )
-
-    if new_js != old_js:
+    # 只在 JSON 实际有变更时才重新生成 JS（避免时间戳导致空提交）
+    if new_count > 0:
+        lines_json = ",\n".join(
+            f'  {{"id": {l["id"]}, "name": "{l["name"]}", "url": "{l["url"]}"}}'
+            for l in data["lines"]
+        )
+        new_js = (
+            f"// auto-generated {datetime.now().strftime('%Y-%m-%d %H:%M')}\n"
+            f"// edit api-lines.json, then run update.cmd or scripts/update.py\n"
+            f"window.__API_LINES__ = [\n{lines_json}\n];\n"
+        )
         with open(JS_PATH, "w", encoding="utf-8") as f:
             f.write(new_js)
         log("  ✓ api-lines.js 已更新")
         return True
     else:
         log("  ✓ api-lines.js 无需更新")
-        return new_count > 0
+        return False
 
 
 def step4_health_check():
