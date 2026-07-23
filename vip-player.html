@@ -4,384 +4,888 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="VIP视频解析-免费在线播放，支持腾讯视频、爱奇艺、优酷、芒果TV、B站等平台">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>VIP视频解析 - 免费在线播放</title>
+<title>VIP · 影流解析</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0f0f0f;
-    --card: #1a1a2e;
-    --primary: #e94560;
-    --primary-hover: #ff6b81;
-    --text: #eee;
-    --text-secondary: #999;
-    --border: #2a2a3e;
-    --input-bg: #16213e;
-    --tag-bg: #1f2b3c;
-  }
-  [data-theme="light"] {
-    --bg: #f5f5f7;
-    --card: #ffffff;
-    --text: #1a1a1a;
-    --text-secondary: #666;
-    --border: #e0e0e6;
-    --input-bg: #f0f0f5;
-    --tag-bg: #e8e8ee;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
+/* ═══════════════ Cinema Dark Theme ═══════════════ */
+:root {
+  --bg-deep: #0a0a0b;
+  --bg-panel: rgba(18, 18, 20, 0.72);
+  --accent: #c9a227;
+  --accent-dim: rgba(201, 162, 39, 0.12);
+  --accent-glow: rgba(201, 162, 39, 0.35);
+  --text-primary: #f0ece4;
+  --text-secondary: #8a8580;
+  --text-muted: #5a5550;
+  --success: #5a9e6b;
+  --warning: #c9a227;
+  --error: #b84a4a;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.12);
+  --input-bg: rgba(0,0,0,0.4);
+  --tag-bg: rgba(0,0,0,0.3);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+[data-theme="light"] {
+  --bg-deep: #f5f0e8;
+  --bg-panel: rgba(255, 252, 245, 0.85);
+  --accent: #8b6914;
+  --accent-dim: rgba(139, 105, 20, 0.1);
+  --accent-glow: rgba(139, 105, 20, 0.2);
+  --text-primary: #1a1a1a;
+  --text-secondary: #666;
+  --text-muted: #999;
+  --border: rgba(0,0,0,0.08);
+  --border-hover: rgba(0,0,0,0.15);
+  --input-bg: rgba(0,0,0,0.03);
+  --tag-bg: rgba(0,0,0,0.04);
+}
 
-  /* ── Header ── */
-  .header {
-    background: var(--card);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 24px;
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 12px;
-  }
-  .logo {
-    font-size: 22px; font-weight: 700;
-    background: linear-gradient(135deg, #e94560, #ff6b81);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .header-right {
-    display: flex; align-items: center; gap: 12px;
-    font-size: 12px; color: var(--text-secondary);
-  }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; min-height: 100vh;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', 'Noto Serif SC', monospace;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
 
-  /* ── Theme Toggle ── */
-  .theme-toggle { position: relative; width: 48px; height: 26px; flex-shrink: 0; }
-  .theme-toggle input { opacity: 0; width: 0; height: 0; }
-  .theme-slider {
-    position: absolute; inset: 0;
-    background: #2a2a3e; border-radius: 26px;
-    cursor: pointer; transition: background .25s;
-    border: 1px solid var(--border);
-  }
-  .theme-slider::before {
-    content: ''; position: absolute;
-    width: 20px; height: 20px; left: 3px; bottom: 2px;
-    background: #ffd500; border-radius: 50%;
-    transition: transform .25s;
-  }
-  .theme-toggle input:checked + .theme-slider { background: #d4e4ff; }
-  .theme-toggle input:checked + .theme-slider::before {
-    transform: translateX(20px); background: #ff9500;
-  }
-  .theme-icon {
-    position: absolute; font-size: 12px;
-    top: 50%; transform: translateY(-50%);
-    pointer-events: none; z-index: 1;
-  }
-  .theme-icon.sun { left: 5px; }
-  .theme-icon.moon { right: 5px; }
+/* 噪点纹理 */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+  pointer-events: none; z-index: 9999;
+}
+/* 背景光晕 */
+.ambient-glow {
+  position: fixed; border-radius: 50%;
+  filter: blur(120px); opacity: 0.06;
+  pointer-events: none; z-index: 0;
+}
+.glow-1 { width: 600px; height: 600px; background: var(--accent); top: -200px; right: -100px; }
+.glow-2 { width: 400px; height: 400px; background: #8b4513; bottom: -100px; left: -100px; }
 
-  /* ── Layout ── */
-  .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+/* 滚动条 */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
-  /* ── Input Card ── */
-  .input-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    margin-bottom: 20px;
-  }
-  .input-card h2 { font-size: 18px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-  .input-card .subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
+/* 字体 */
+.font-display { font-family: 'Playfair Display', 'Noto Serif SC', serif; }
+.font-mono { font-family: 'JetBrains Mono', monospace; }
 
-  .input-row { display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
-  .input-row input {
-    flex: 1; min-width: 260px;
-    padding: 14px 44px 14px 18px;
-    border-radius: 12px;
-    border: 2px solid var(--border);
-    background: var(--input-bg); color: var(--text);
-    font-size: 15px; outline: none;
-    transition: border-color .2s;
-  }
-  .input-row input:focus { border-color: var(--primary); }
-  .input-row input::placeholder { color: #888; }
+/* 毛玻璃面板 */
+.glass {
+  background: var(--bg-panel);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  border: 1px solid var(--border);
+}
 
-  .btn-clear-input {
-    position: absolute; right: 120px; top: 50%;
-    transform: translateY(-50%);
-    width: 28px; height: 28px; border-radius: 50%; border: none;
-    background: rgba(128,128,128,.25); color: var(--text-secondary);
-    font-size: 14px; cursor: pointer;
-    display: none; align-items: center; justify-content: center;
-    line-height: 1; z-index: 2;
-  }
-  .btn-clear-input:hover { background: var(--primary); color: #fff; }
-  .btn-clear-input.visible { display: flex; }
+/* ═══════════════ Header ═══════════════ */
+.header {
+  position: relative; z-index: 10;
+  padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-panel);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.logo-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), #8b6914);
+  display: flex; align-items: center; justify-content: center;
+  color: #0a0a0b; font-weight: 700; font-size: 14px;
+  font-family: 'Playfair Display', serif;
+  flex-shrink: 0;
+}
+.logo-text {
+  font-family: 'Playfair Display', 'Noto Serif SC', serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--text-primary);
+}
+.logo-sub {
+  font-size: 12px; color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace; font-weight: 400;
+}
+.header-right { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text-secondary); }
 
-  .btn-play {
-    padding: 14px 32px; border-radius: 12px; border: none;
-    background: var(--primary); color: #fff;
-    font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap;
-    transition: background .2s, transform .1s;
-  }
-  .btn-play:hover { background: var(--primary-hover); }
-  .btn-play:active { transform: scale(.97); }
+/* Theme toggle */
+.theme-toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+.theme-toggle input { opacity: 0; width: 0; height: 0; }
+.theme-slider {
+  position: absolute; inset: 0;
+  background: #2a2a3e; border-radius: 24px;
+  cursor: pointer; transition: background .25s;
+  border: 1px solid var(--border);
+}
+.theme-slider::before {
+  content: ''; position: absolute;
+  width: 18px; height: 18px; left: 2px; bottom: 2px;
+  background: #ffd500; border-radius: 50%;
+  transition: transform .25s;
+}
+.theme-toggle input:checked + .theme-slider { background: #c9d8f0; }
+.theme-toggle input:checked + .theme-slider::before {
+  transform: translateX(20px); background: #ff9500;
+}
 
-  /* ── API Lines ── */
-  .api-lines { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; }
-  .api-tag {
-    padding: 6px 14px; border-radius: 20px; font-size: 12px;
-    cursor: pointer; border: 1px solid var(--border);
-    background: var(--tag-bg); color: var(--text-secondary);
-    transition: all .15s; user-select: none;
-  }
-  .api-tag:hover { border-color: var(--primary); color: var(--text); }
-  .api-tag.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+/* ═══════════════ Container ═══════════════ */
+.container { max-width: 960px; margin: 0 auto; padding: 24px 16px; position: relative; z-index: 10; }
 
-  /* ── Quick Links ── */
-  .quick-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-  .quick-link {
-    padding: 5px 12px; border-radius: 6px; font-size: 12px;
-    background: var(--tag-bg); border: 1px solid var(--border);
-    color: var(--text-secondary); text-decoration: none;
-    transition: all .15s;
-  }
-  .quick-link:hover { border-color: var(--primary); color: var(--primary); }
+/* ═══════════════ Input Card ═══════════════ */
+.input-card {
+  border-radius: var(--radius-lg); padding: 28px; margin-bottom: 20px;
+}
+.section-label {
+  font-size: 11px; color: var(--accent); letter-spacing: 0.08em;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 6px;
+}
+.input-card .subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 18px; }
 
-  /* ── History ── */
-  .history-section {
-    background: var(--card); border-radius: 16px;
-    padding: 24px 28px; border: 1px solid var(--border);
-    margin-bottom: 20px;
-  }
-  .history-section h3 { font-size: 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-  .history-list { display: flex; flex-direction: column; gap: 6px; }
-  .history-item {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 14px; border-radius: 8px;
-    background: var(--input-bg); font-size: 13px; gap: 10px;
-  }
-  .history-item .url-text {
-    flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    color: var(--text-secondary);
-  }
-  .history-item .platform-tag {
-    padding: 2px 8px; border-radius: 4px; font-size: 11px;
-    background: var(--primary); color: #fff; white-space: nowrap;
-  }
-  .history-item button {
-    padding: 4px 12px; border-radius: 6px;
-    border: 1px solid var(--border); background: transparent;
-    color: var(--text-secondary); cursor: pointer; font-size: 12px;
-    transition: border-color .15s, color .15s;
-  }
-  .history-item button:hover { border-color: var(--primary); color: var(--primary); }
-  .btn-clear {
-    margin-top: 12px; padding: 6px 16px; border-radius: 6px;
-    border: 1px solid var(--border); background: transparent;
-    color: var(--text-secondary); cursor: pointer; font-size: 12px;
-  }
-  .btn-clear:hover { color: var(--primary); border-color: var(--primary); }
+.input-row { display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+.input-row input {
+  flex: 1; min-width: 260px;
+  padding: 13px 44px 13px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--input-bg); color: var(--text-primary);
+  font-size: 13px; font-family: 'JetBrains Mono', monospace;
+  outline: none; letter-spacing: 0.02em;
+  transition: border-color .25s, box-shadow .25s;
+}
+.input-row input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+.input-row input::placeholder { color: var(--text-muted); }
 
-  /* ── Tips ── */
-  .tips {
-    padding: 16px 20px; background: var(--card);
-    border-radius: 12px; border: 1px solid var(--border);
-    font-size: 13px; color: var(--text-secondary); line-height: 1.8;
-  }
-  .tips strong { color: var(--text); }
+.btn-clear-input {
+  position: absolute; right: 110px; top: 50%;
+  transform: translateY(-50%);
+  width: 26px; height: 26px; border-radius: 50%; border: none;
+  background: rgba(128,128,128,.2); color: var(--text-secondary);
+  font-size: 12px; cursor: pointer;
+  display: none; align-items: center; justify-content: center;
+  line-height: 1; z-index: 2;
+  transition: background .15s, color .15s;
+}
+.btn-clear-input:hover { background: var(--accent); color: #0a0a0b; }
+.btn-clear-input.visible { display: flex; }
 
-  @media (max-width: 600px) {
-    .input-row { flex-direction: column; }
-    .btn-play { width: 100%; text-align: center; }
-    .btn-clear-input { right: 12px; }
-    .container { padding: 12px 8px; }
-    .input-card, .history-section { padding: 16px; }
-    .header { padding: 10px 14px; }
-    .header-right span { display: none; }
+/* 金色按钮 */
+.btn-gold {
+  padding: 13px 28px; border-radius: var(--radius-md); border: none;
+  background: linear-gradient(135deg, var(--accent), #a08020);
+  color: #0a0a0b; font-size: 14px; font-weight: 600;
+  font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em;
+  cursor: pointer; white-space: nowrap;
+  transition: all .25s; position: relative; overflow: hidden;
+}
+.btn-gold:hover { transform: translateY(-1px); box-shadow: 0 8px 24px var(--accent-glow); }
+.btn-gold:active { transform: translateY(0); }
+.btn-gold:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-gold::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: translateX(-100%); transition: transform .6s;
+}
+.btn-gold:hover::after { transform: translateX(100%); }
+
+/* ═══════════════ Speed / API Section ═══════════════ */
+.speed-status {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text-secondary); margin-top: 18px; margin-bottom: 8px;
+}
+.speed-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  display: inline-block; transition: background .3s;
+}
+.speed-dot.fast    { background: var(--success); box-shadow: 0 0 4px var(--success); }
+.speed-dot.medium  { background: var(--warning); box-shadow: 0 0 4px var(--warning); }
+.speed-dot.slow    { background: var(--error); }
+.speed-dot.pending { background: #555; animation: pulse-dot 1s infinite; }
+.speed-dot.offline { background: #333; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .3; }
+}
+
+.btn-respeed {
+  font-size: 11px; padding: 4px 12px; border-radius: 12px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-secondary); cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  transition: all .15s;
+}
+.btn-respeed:hover { border-color: var(--accent); color: var(--accent); }
+.btn-respeed:disabled { opacity: .4; cursor: wait; }
+
+/* 线路卡片 */
+.api-lines {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px;
+}
+.route-card {
+  background: var(--tag-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  cursor: pointer; user-select: none;
+  transition: all .2s;
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px;
+}
+.route-card:hover {
+  border-color: var(--border-hover);
+  background: rgba(255,255,255,0.03);
+}
+.route-card.active {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+.route-card.active::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; background: var(--accent);
+}
+.route-card.fast-line { border-color: rgba(90,158,107,.4); }
+
+.speed-badge {
+  font-size: 10px; border-radius: 8px; padding: 1px 6px;
+  font-weight: 600; flex-shrink: 0; margin-left: auto;
+}
+.speed-badge.tier-1 { background: rgba(90,158,107,.15); color: var(--success); }
+.speed-badge.tier-2 { background: rgba(201,162,39,.15); color: var(--warning); }
+.speed-badge.tier-3 { background: rgba(184,74,74,.15); color: var(--error); }
+.speed-badge.tier-0 { background: rgba(128,128,128,.1); color: #555; }
+
+.fail-count {
+  font-size: 9px; padding: 1px 5px; border-radius: 8px;
+  background: rgba(184,74,74,.2); color: var(--error);
+  margin-left: 2px;
+}
+
+/* ═══════════════ Quick Links ═══════════════ */
+.quick-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.quick-link {
+  padding: 5px 12px; border-radius: 6px; font-size: 11px;
+  background: var(--tag-bg); border: 1px solid var(--border);
+  color: var(--text-secondary); text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  transition: all .15s;
+}
+.quick-link:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ═══════════════ History ═══════════════ */
+.history-section {
+  border-radius: var(--radius-lg); padding: 24px 28px;
+  margin-bottom: 20px;
+}
+.history-list { display: flex; flex-direction: column; gap: 6px; }
+.history-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; border-radius: var(--radius-sm);
+  background: var(--input-bg); font-size: 13px; gap: 10px;
+  border: 1px solid transparent;
+  transition: all .15s;
+}
+.history-item:hover { border-color: var(--border); background: rgba(255,255,255,0.02); }
+.history-item .url-text {
+  flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; font-size: 12px;
+}
+.history-item .platform-tag {
+  padding: 2px 8px; border-radius: 4px; font-size: 11px;
+  background: var(--accent-dim); color: var(--accent); white-space: nowrap;
+}
+.history-item button {
+  padding: 4px 12px; border-radius: 6px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-secondary); cursor: pointer; font-size: 12px;
+  transition: all .15s;
+}
+.history-item button:hover { border-color: var(--accent); color: var(--accent); }
+.btn-clear {
+  margin-top: 12px; padding: 6px 16px; border-radius: 6px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-secondary); cursor: pointer; font-size: 12px;
+  transition: all .15s;
+}
+.btn-clear:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ═══════════════ Tips ═══════════════ */
+.tips {
+  padding: 20px 24px; border-radius: var(--radius-md);
+  border: 1px solid var(--border); background: var(--bg-panel);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  font-size: 13px; color: var(--text-secondary); line-height: 1.8;
+}
+.tips strong { color: var(--text-primary); }
+
+/* ═══════════════ Toast ═══════════════ */
+.toast-container {
+  position: fixed; top: 20px; right: 20px; z-index: 10000;
+  display: flex; flex-direction: column; gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  padding: 12px 20px; border-radius: var(--radius-md);
+  font-size: 13px; font-weight: 500; color: #f0ece4;
+  background: rgba(18,18,20,0.95);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  animation: toast-in .3s ease;
+  max-width: 380px;
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.toast.toast-out { animation: toast-out .25s ease forwards; }
+.toast-success { border-left: 3px solid var(--success); }
+.toast-error   { border-left: 3px solid var(--error); }
+.toast-info    { border-left: 3px solid #1a73e8; }
+.toast-warning { border-left: 3px solid var(--warning); }
+
+@keyframes toast-in  { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes toast-out { to   { opacity: 0; transform: translateX(40px); } }
+
+/* ═══════════════ Animations ═══════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-in { animation: fadeUp .5s cubic-bezier(0.16,1,0.3,1) forwards; opacity: 0; }
+.delay-1 { animation-delay: 0.05s; }
+.delay-2 { animation-delay: 0.15s; }
+.delay-3 { animation-delay: 0.25s; }
+
+/* ═══════════════ Responsive ═══════════════ */
+@media (max-width: 600px) {
+  .input-row { flex-direction: column; }
+  .btn-gold { width: 100%; text-align: center; }
+  .btn-clear-input { right: 12px; }
+  .container { padding: 12px 8px; }
+  .input-card, .history-section { padding: 16px; }
+  .header { padding: 10px 14px; }
+  .header-right span { display: none; }
+  .toast { max-width: 90vw; font-size: 12px; }
+  .api-lines { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
+}
 </style>
 </head>
 <body>
 
-<header class="header">
-  <span class="logo">🎬 VIP视频解析</span>
+<div class="ambient-glow glow-1"></div>
+<div class="ambient-glow glow-2"></div>
+
+<header class="header animate-in">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="logo-icon">V</div>
+    <div>
+      <span class="logo-text">影流解析</span>
+      <span class="logo-sub"> / STREAM</span>
+    </div>
+  </div>
   <div class="header-right">
-    <span>粘贴链接 → 选择线路 → 免费播放</span>
-    <label class="theme-toggle" title="切换深色/浅色模式">
+    <span class="font-mono" style="font-size:11px;color:var(--text-muted)">粘贴链接 → 选择线路 → 播放</span>
+    <label class="theme-toggle" title="切换深浅色">
       <input type="checkbox" id="themeCheckbox">
       <span class="theme-slider"></span>
-      <span class="theme-icon sun">☀️</span>
-      <span class="theme-icon moon">🌙</span>
     </label>
   </div>
 </header>
 
 <div class="container">
 
-  <div class="input-card">
-    <h2>📎 粘贴视频链接</h2>
+  <!-- Input Card -->
+  <div class="input-card glass animate-in delay-1">
+    <div class="section-label">INPUT_URL</div>
     <p class="subtitle">支持 腾讯视频 · 爱奇艺 · 优酷 · 芒果TV · B站 · 搜狐 等主流平台</p>
 
     <div class="input-row">
       <input id="urlInput" type="text"
-        placeholder="在此粘贴视频播放页链接，例如：https://v.qq.com/x/cover/xxxxx.html"
-        autocomplete="off"
+        placeholder="粘贴视频链接: https://v.qq.com/x/cover/..."
+        autocomplete="off" enterkeyhint="go"
       />
-      <button class="btn-clear-input" id="btnClearInput" title="清空">✕</button>
-      <button class="btn-play" id="btnPlay">▶ 开始播放</button>
+      <button class="btn-clear-input" id="btnClearInput" title="清空（Esc）">✕</button>
+      <button class="btn-gold" id="btnPlay">▶ 解析播放</button>
     </div>
 
-    <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">选择解析线路：</div>
+    <!-- Speed + API Lines -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;margin-bottom:8px">
+      <div class="speed-status" style="margin-top:0;margin-bottom:0">
+        <span style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace">ROUTES</span>
+        <span class="speed-dot pending" id="speedGlobalDot" title="测速中"></span>
+        <span id="speedGlobalText" style="font-size:11px;color:var(--text-muted)"></span>
+      </div>
+      <button class="btn-respeed" id="btnRespeed" title="重新测速">🔄 测速</button>
+    </div>
     <div class="api-lines" id="apiLines"></div>
 
-    <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">快速跳转到视频平台：</div>
+    <div style="margin-top:14px;font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace">快捷跳转：</div>
     <div class="quick-links">
       <a class="quick-link" href="https://v.qq.com" target="_blank" rel="noopener">腾讯视频</a>
       <a class="quick-link" href="https://www.iqiyi.com" target="_blank" rel="noopener">爱奇艺</a>
       <a class="quick-link" href="https://www.youku.com" target="_blank" rel="noopener">优酷</a>
       <a class="quick-link" href="https://www.mgtv.com" target="_blank" rel="noopener">芒果TV</a>
       <a class="quick-link" href="https://www.bilibili.com" target="_blank" rel="noopener">B站</a>
-      <a class="quick-link" href="https://tv.sohu.com" target="_blank" rel="noopener">搜狐视频</a>
-      <a class="quick-link" href="https://www.pptv.com" target="_blank" rel="noopener">PPTV</a>
+      <a class="quick-link" href="https://tv.sohu.com" target="_blank" rel="noopener">搜狐</a>
     </div>
   </div>
 
-  <div class="history-section">
-    <h3>🕐 播放历史</h3>
+  <!-- History -->
+  <div class="history-section glass animate-in delay-2">
+    <div class="section-label" style="margin-bottom:12px">HISTORY</div>
     <div class="history-list" id="historyList">
-      <div style="color:var(--text-secondary);font-size:13px;padding:8px 0">暂无播放记录</div>
+      <div style="color:var(--text-muted);font-size:12px;padding:8px 0">暂无播放记录</div>
     </div>
     <button class="btn-clear" id="btnClearHistory">清空历史</button>
   </div>
 
-  <div class="tips">
+  <!-- Tips -->
+  <div class="tips animate-in delay-3">
     <strong>💡 使用说明：</strong><br>
-    1. 打开腾讯视频/爱奇艺/优酷/芒果TV等网站，找到想看的VIP视频，<strong>复制浏览器地址栏的完整链接</strong><br>
-    2. 将链接粘贴到上方输入框，选择合适的解析线路<br>
-    3. 点击"开始播放"，会在<strong>新标签页</strong>中打开解析页面<br>
-    4. 如果某条线路无法播放，请切换其他线路重试<br>
+    1. 打开视频平台，找到VIP视频，<strong>复制浏览器地址栏完整链接</strong><br>
+    2. 粘贴到输入框，系统<strong>自动测速</strong>标记最快线路（左侧金色竖条 = 当前选中）<br>
+    3. 点击「解析播放」或按 <strong>Enter</strong>，<strong>新标签页</strong>打开解析<br>
+    4. 某线路失效时，<strong>右键线路标签</strong>标记失败，自动推荐最优线路<br>
     <br>
-    <strong>⚠️ 提示：</strong>解析接口来自第三方，如有广告请勿轻信。本项目纯前端静态页面，不收集任何数据。仅供学习交流使用。
+    <strong>⚠️ 提示：</strong>解析接口来自第三方，如有广告请勿轻信。仅供学习交流使用。
   </div>
 
 </div>
 
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
 <script src="api-lines.js"></script>
 <script>
-var urlInput = document.getElementById('urlInput');
-var btnPlay = document.getElementById('btnPlay');
-var btnClearInput = document.getElementById('btnClearInput');
-var apiLines = document.getElementById('apiLines');
-var historyList = document.getElementById('historyList');
-var btnClearHistory = document.getElementById('btnClearHistory');
-var themeCheckbox = document.getElementById('themeCheckbox');
+/* ═══════════════════════════════════════════════════════════
+   VIP Video Parser — Cinema Edition
+   Design: Dark cinema gold theme
+   Logic:  concurrent speed probe + localStorage cache (10min TTL),
+           auto-select fastest, speed-tier badges, fail counting,
+           keyboard shortcuts, toast system
+   ═══════════════════════════════════════════════════════════ */
 
-var apiList = window.__API_LINES__ || [];
-var currentApi = (apiList[0] && apiList[0].url) || '';
-var HISTORY_KEY = 'vip_video_history';
-var API_KEY = 'vip_video_api';
-var THEME_KEY = 'vip_video_theme';
+/* ─────────────── DOM refs ─────────────── */
+var $  = function(id) { return document.getElementById(id); };
+var urlInput        = $('urlInput');
+var btnPlay         = $('btnPlay');
+var btnClearInput   = $('btnClearInput');
+var apiLines        = $('apiLines');
+var historyList     = $('historyList');
+var btnClearHistory = $('btnClearHistory');
+var themeCheckbox   = $('themeCheckbox');
+var btnRespeed      = $('btnRespeed');
+var toastContainer  = $('toastContainer');
+var speedGlobalDot  = $('speedGlobalDot');
+var speedGlobalText = $('speedGlobalText');
 
-// ── Theme ──
+/* ─────────────── Constants ─────────────── */
+var HISTORY_KEY        = 'vip_video_history';
+var API_KEY            = 'vip_video_api';
+var THEME_KEY          = 'vip_video_theme';
+var SPEED_CACHE_KEY    = 'vip_line_speeds_v2';
+var FAIL_COUNT_KEY     = 'vip_line_fails';
+var REMOTE_LINES_CACHE = 'vip_remote_lines';
+var SPEED_CACHE_TTL    = 10 * 60 * 1000;
+var REMOTE_CACHE_TTL   = 60 * 60 * 1000; // 1h — remote fetch throttle
+var PROBE_TIMEOUT      = 5000;
+var REMOTE_FETCH_TIMEOUT = 3000;
+var SPEED_TIERS        = { fast: 600, medium: 2000 };
+var REMOTE_API_URL     = 'https://raw.githubusercontent.com/0xing1/vip-video-resources/main/api-lines.js';
+
+var apiList     = window.__API_LINES__ || [];
+var currentApi  = (apiList[0] && apiList[0].url) || '';
+var speedCache  = {};
+var failCounts  = {};
+var isProbing   = false;
+
+/* ═══════════════ Toast ═══════════════ */
+function toast(msg, type) {
+  type = type || 'info';
+  var el = document.createElement('div');
+  el.className = 'toast toast-' + type;
+  var icons = { success: '✓', error: '✗', info: 'ℹ', warning: '!' };
+  el.textContent = (icons[type] || '') + ' ' + msg;
+  toastContainer.appendChild(el);
+  var timer = setTimeout(function() {
+    el.classList.add('toast-out');
+    el.addEventListener('animationend', function() { if (el.parentNode) el.parentNode.removeChild(el); });
+  }, 2800);
+  el.addEventListener('click', function() {
+    clearTimeout(timer);
+    el.classList.add('toast-out');
+    el.addEventListener('animationend', function() { if (el.parentNode) el.parentNode.removeChild(el); });
+  });
+}
+
+/* ═══════════════ DNS Prefetch ═══════════════ */
+function applyDnsPrefetch() {
+  var origins = [];
+  for (var i = 0; i < apiList.length; i++) {
+    try { origins.push(new URL(apiList[i].url).origin); } catch(e) {}
+  }
+  origins = origins.filter(function(v, i, a) { return a.indexOf(v) === i; });
+  var existing = {};
+  var links = document.querySelectorAll('link[rel="dns-prefetch"]');
+  for (var i = 0; i < links.length; i++) { existing[links[i].href] = true; }
+  for (var i = 0; i < origins.length; i++) {
+    if (existing[origins[i]]) continue;
+    var link = document.createElement('link');
+    link.rel = 'dns-prefetch';
+    link.href = origins[i];
+    document.head.appendChild(link);
+  }
+}
+
+/* ═══════════════ Remote Lines Sync ═══════════════ */
+function fetchLatestApiLines() {
+  // cache-first: don't fetch if we checked within 1 hour
+  try {
+    var cached = JSON.parse(localStorage.getItem(REMOTE_LINES_CACHE));
+    if (cached && cached.ts && (Date.now() - cached.ts < REMOTE_CACHE_TTL)) return;
+  } catch(e) {}
+
+  var ctrl = new AbortController();
+  var timer = setTimeout(function() { ctrl.abort(); }, REMOTE_FETCH_TIMEOUT);
+
+  fetch(REMOTE_API_URL, { signal: ctrl.signal, cache: 'no-cache' })
+    .then(function(res) {
+      clearTimeout(timer);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.text();
+    })
+    .then(function(text) {
+      // parse "window.__API_LINES__ = [...];"
+      var match = text.match(/window\.__API_LINES__\s*=\s*(\[[\s\S]*?\])/);
+      if (!match) return;
+      var remoteLines = JSON.parse(match[1]);
+      if (!remoteLines || !remoteLines.length) return;
+
+      // compare with current
+      var same = apiList.length === remoteLines.length &&
+        apiList.every(function(l, i) { return l.url === remoteLines[i].url; });
+
+      if (same) {
+        // update cache timestamp only
+        try { localStorage.setItem(REMOTE_LINES_CACHE, JSON.stringify({ ts: Date.now() })); } catch(e) {}
+        return;
+      }
+
+      // new lines available — update
+      apiList = remoteLines;
+      window.__API_LINES__ = remoteLines;
+      try {
+        localStorage.setItem(REMOTE_LINES_CACHE, JSON.stringify({ ts: Date.now(), data: remoteLines }));
+      } catch(e) {}
+
+      // reset speed cache (routes changed)
+      try { localStorage.removeItem(SPEED_CACHE_KEY); } catch(e) {}
+      speedCache = {};
+
+      // keep current selection if still exists, else pick fastest
+      var stillExists = apiList.some(function(l) { return l.url === currentApi; });
+      if (!stillExists) {
+        currentApi = apiList[0] ? apiList[0].url : '';
+        try { localStorage.setItem(API_KEY, currentApi); } catch(e) {}
+      }
+
+      applyDnsPrefetch();
+      renderApiTags();
+      getSpeeds(); // re-probe in background
+      toast('线路列表已更新（' + remoteLines.length + ' 条）', 'info');
+    })
+    .catch(function() {
+      // silent fallback — local api-lines.js already loaded
+    });
+}
+
+/* ═══════════════ Speed Probe ═══════════════ */
+function getOrigin(apiUrl) {
+  try { return new URL(apiUrl).origin; } catch(e) { return apiUrl; }
+}
+
+function probeOne(origin) {
+  return new Promise(function(resolve) {
+    var start = performance.now();
+    var done = false;
+    var ctrl = new AbortController();
+    var timer = setTimeout(function() {
+      if (done) return;
+      done = true; ctrl.abort();
+      resolve({ latency: null, method: 'timeout' });
+    }, PROBE_TIMEOUT);
+
+    fetch(origin, { method: 'HEAD', mode: 'no-cors', signal: ctrl.signal, cache: 'no-cache' })
+      .then(function() {
+        if (done) return;
+        done = true; clearTimeout(timer);
+        resolve({ latency: Math.round(performance.now() - start), method: 'head' });
+      })
+      .catch(function() {
+        if (done) return;
+        fetch(origin, { mode: 'no-cors', signal: ctrl.signal, cache: 'no-cache' })
+          .then(function() {
+            if (done) return;
+            done = true; clearTimeout(timer);
+            resolve({ latency: Math.round(performance.now() - start), method: 'get' });
+          })
+          .catch(function() {
+            if (done) return;
+            done = true; clearTimeout(timer);
+            resolve({ latency: null, method: 'failed' });
+          });
+      });
+  });
+}
+
+function probeAll() {
+  isProbing = true;
+  btnRespeed.disabled = true;
+  speedGlobalDot.className = 'speed-dot pending';
+  speedGlobalText.textContent = '测速中...';
+
+  var originMap = {};
+  var origins = [];
+  for (var i = 0; i < apiList.length; i++) {
+    var o = getOrigin(apiList[i].url);
+    if (!originMap[o]) { originMap[o] = true; origins.push(o); }
+  }
+
+  var doneCount = 0;
+  return Promise.all(origins.map(function(origin) {
+    return probeOne(origin).then(function(r) {
+      doneCount++;
+      speedGlobalText.textContent = '测速中 ' + doneCount + '/' + origins.length;
+      return { origin: origin, latency: r.latency };
+    });
+  })).then(function(results) {
+    var map = {};
+    for (var i = 0; i < results.length; i++) map[results[i].origin] = results[i].latency;
+    return map;
+  }).finally(function() {
+    isProbing = false;
+    btnRespeed.disabled = false;
+  });
+}
+
+function getSpeeds() {
+  return new Promise(function(resolve) {
+    try {
+      var cached = JSON.parse(localStorage.getItem(SPEED_CACHE_KEY));
+      if (cached && cached.ts && (Date.now() - cached.ts < SPEED_CACHE_TTL) && cached.data) {
+        if (Object.keys(cached.data).length > 0) {
+          speedCache = cached.data;
+          updateSpeedUI();
+          resolve(speedCache);
+          return;
+        }
+      }
+    } catch(e) {}
+    probeAll().then(function(data) {
+      speedCache = data;
+      try { localStorage.setItem(SPEED_CACHE_KEY, JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
+      updateSpeedUI();
+      resolve(data);
+    });
+  });
+}
+
+function speedTier(latency) {
+  if (latency === null || latency === undefined) return 0;
+  if (latency <= SPEED_TIERS.fast)   return 1;
+  if (latency <= SPEED_TIERS.medium) return 2;
+  return 3;
+}
+
+function formatLatency(ms) {
+  if (ms === null || ms === undefined) return '-';
+  if (ms < 1000) return ms + 'ms';
+  return (ms / 1000).toFixed(1) + 's';
+}
+
+function getLineLatency(apiUrl) { return speedCache[getOrigin(apiUrl)]; }
+
+function getFastestApiUrl() {
+  var best = null, bestScore = Infinity;
+  for (var i = 0; i < apiList.length; i++) {
+    var lat = getLineLatency(apiList[i].url);
+    var fail = failCounts[getOrigin(apiList[i].url)] || 0;
+    var score = (lat !== null && lat !== undefined ? lat : 3000) + fail * 2000;
+    if (score < bestScore) { bestScore = score; best = apiList[i].url; }
+  }
+  return best;
+}
+
+/* ═══════════════ Fail Counting ═══════════════ */
+function loadFailCounts() {
+  try {
+    var d = JSON.parse(localStorage.getItem(FAIL_COUNT_KEY));
+    if (d && d.ts && (Date.now() - d.ts < 24 * 60 * 60 * 1000)) { failCounts = d.data || {}; return; }
+  } catch(e) {}
+  failCounts = {};
+}
+function saveFailCounts() {
+  try { localStorage.setItem(FAIL_COUNT_KEY, JSON.stringify({ ts: Date.now(), data: failCounts })); } catch(e) {}
+}
+
+function markLineFailed() {
+  var origin = getOrigin(currentApi);
+  failCounts[origin] = (failCounts[origin] || 0) + 1;
+  saveFailCounts();
+  var fastest = getFastestApiUrl();
+  if (fastest && fastest !== currentApi) {
+    currentApi = fastest;
+    try { localStorage.setItem(API_KEY, currentApi); } catch(e) {}
+    toast('已自动切换到最快线路，请重试', 'warning');
+  } else {
+    toast('已记录，请手动切换其他线路', 'warning');
+  }
+  renderApiTags();
+}
+
+/* ═══════════════ Speed UI ═══════════════ */
+function updateSpeedUI() {
+  var bestLatency = null;
+  for (var i = 0; i < apiList.length; i++) {
+    var lat = getLineLatency(apiList[i].url);
+    if (lat !== null && lat !== undefined && (bestLatency === null || lat < bestLatency)) {
+      bestLatency = lat;
+    }
+  }
+  if (bestLatency !== null) {
+    speedGlobalDot.className = speedTier(bestLatency) <= 2 ? 'speed-dot fast' : 'speed-dot medium';
+    speedGlobalText.textContent = '最快 ' + formatLatency(bestLatency);
+  } else {
+    speedGlobalDot.className = 'speed-dot offline';
+    speedGlobalText.textContent = '部分线路测速失败';
+  }
+  renderApiTags();
+  if (!localStorage.getItem(API_KEY) && bestLatency !== null) {
+    var fastest = getFastestApiUrl();
+    if (fastest) currentApi = fastest;
+  }
+}
+
+function renderApiTags() {
+  if (!apiList.length) {
+    apiLines.innerHTML = '<span style="color:var(--text-muted);font-size:12px">暂无可用解析线路</span>';
+    return;
+  }
+  var hasAnySpeed = Object.keys(speedCache).length > 0;
+
+  apiLines.innerHTML = apiList.map(function(line) {
+    var origin = getOrigin(line.url);
+    var latency = speedCache[origin];
+    var tier = speedTier(latency);
+    var fail = failCounts[origin] || 0;
+    var isActive = line.url === currentApi;
+
+    var cls = 'route-card';
+    if (isActive) cls += ' active';
+    if (tier === 1 && !isActive) cls += ' fast-line';
+
+    var badgeHtml = '';
+    if (hasAnySpeed) {
+      badgeHtml = '<span class="speed-badge tier-' + tier + '">' + formatLatency(latency) + '</span>';
+    } else if (isProbing) {
+      badgeHtml = '<span class="speed-dot pending" style="width:6px;height:6px" title="测速中"></span>';
+    }
+
+    var failHtml = fail > 0 ? '<span class="fail-count">' + fail + '</span>' : '';
+
+    return '<div class="' + cls + '" data-api="' + line.url + '" data-origin="' + origin + '">' +
+      '<span>' + line.id + '. ' + line.name + '</span>' +
+      badgeHtml + failHtml +
+    '</div>';
+  }).join('');
+}
+
+/* ═══════════════ Theme ═══════════════ */
 function initTheme() {
-  var saved = localStorage.getItem(THEME_KEY) || 'dark';
+  var saved = 'dark';
+  try { saved = localStorage.getItem(THEME_KEY) || 'dark'; } catch(e) {}
   applyTheme(saved);
   themeCheckbox.checked = (saved === 'light');
   themeCheckbox.addEventListener('change', function() {
     var next = themeCheckbox.checked ? 'light' : 'dark';
     applyTheme(next);
-    localStorage.setItem(THEME_KEY, next);
+    try { localStorage.setItem(THEME_KEY, next); } catch(e) {}
   });
 }
 function applyTheme(t) { document.documentElement.setAttribute('data-theme', t); }
 
-// ── Init ──
-function init() {
-  initTheme();
-  renderApiTags();
+/* ═══════════════ URL Handling ═══════════════ */
+var PLATFORM_MAP = {
+  'v.qq.com': '腾讯视频', 'iqiyi.com': '爱奇艺', 'iq.com': '爱奇艺',
+  'youku.com': '优酷', 'mgtv.com': '芒果TV', 'bilibili.com': 'B站',
+  'sohu.com': '搜狐', 'pptv.com': 'PPTV', '1905.com': '1905',
+  'le.com': '乐视', 'acfun.cn': 'AcFun', 'douyin.com': '抖音',
+  'kuaishou.com': '快手', 'xigua.com': '西瓜视频', 'weibo.com': '微博'
+};
 
-  var savedApi = localStorage.getItem(API_KEY);
-  if (savedApi) {
-    currentApi = savedApi;
-    var tags = document.querySelectorAll('.api-tag');
-    for (var i = 0; i < tags.length; i++) {
-      tags[i].classList.toggle('active', tags[i].dataset.api === savedApi);
-    }
-  }
-
-  renderHistory();
-
-  apiLines.addEventListener('click', function(e) {
-    var tag = e.target.closest('.api-tag');
-    if (!tag) return;
-    var tags = document.querySelectorAll('.api-tag');
-    for (var i = 0; i < tags.length; i++) tags[i].classList.remove('active');
-    tag.classList.add('active');
-    currentApi = tag.dataset.api;
-    localStorage.setItem(API_KEY, currentApi);
-  });
-
-  btnPlay.addEventListener('click', play);
-  urlInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') play(); });
-
-  btnClearInput.addEventListener('click', function() {
-    urlInput.value = ''; urlInput.focus(); updateClearBtn();
-  });
-  urlInput.addEventListener('input', updateClearBtn);
-
-  btnClearHistory.addEventListener('click', function() {
-    localStorage.removeItem(HISTORY_KEY); renderHistory();
-  });
-
-  historyList.addEventListener('click', function(e) {
-    var btn = e.target.closest('.replay-btn');
-    if (btn) { urlInput.value = btn.dataset.url; play(); }
-  });
-}
-
-function updateClearBtn() {
-  btnClearInput.classList.toggle('visible', !!urlInput.value.trim());
-}
-
-function play() {
-  var url = urlInput.value.trim();
-  if (!url) return alert('请先粘贴视频链接！');
-  if (!/^https?:\/\//i.test(url)) { url = 'https://' + url; urlInput.value = url; }
-
-  window.open(currentApi + encodeURIComponent(url), '_blank');
-  saveHistory(url);
-  renderHistory();
-}
-
-// ── API Tags ──
-function renderApiTags() {
-  if (!apiList.length) {
-    apiLines.innerHTML = '<span style="color:var(--text-secondary);font-size:12px">暂无可用解析线路</span>';
-    return;
-  }
-  apiLines.innerHTML = apiList.map(function(line, i) {
-    var isFirst = i === 0 && !localStorage.getItem(API_KEY);
-    return '<span class="api-tag' + (isFirst ? ' active' : '') + '" data-api="' + line.url + '">线路' + line.id + ' ' + line.name + '</span>';
-  }).join('');
-  if (!localStorage.getItem(API_KEY) && apiList[0]) currentApi = apiList[0].url;
-}
-
-// ── History ──
 function detectPlatform(url) {
-  var m = { 'v.qq.com':'腾讯视频','iqiyi.com':'爱奇艺','iq.com':'爱奇艺','youku.com':'优酷','mgtv.com':'芒果TV','bilibili.com':'B站','sohu.com':'搜狐','pptv.com':'PPTV','1905.com':'1905','le.com':'乐视' };
-  for (var k in m) { if (url.indexOf(k) !== -1) return m[k]; }
+  for (var k in PLATFORM_MAP) { if (url.indexOf(k) !== -1) return PLATFORM_MAP[k]; }
   return '未知';
 }
 
+function normalizeUrl(url) {
+  url = url.trim();
+  if (!/^https?:\/\//i.test(url) && /\.(com|cn|net|org|tv)\b/i.test(url)) url = 'https://' + url;
+  return url;
+}
+
+/* ═══════════════ Play ═══════════════ */
+function play() {
+  var url = normalizeUrl(urlInput.value.trim());
+  if (!url) { toast('请先粘贴视频链接！', 'warning'); return; }
+  if (!/^https?:\/\//i.test(url)) { toast('请输入完整链接（以 http:// 或 https:// 开头）', 'error'); return; }
+
+  urlInput.value = url;
+  var platform = detectPlatform(url);
+  var fullUrl = currentApi + encodeURIComponent(url);
+  window.open(fullUrl, '_blank');
+  saveHistory(url);
+  renderHistory();
+
+  if (platform !== '未知') {
+    toast('正在 ' + platform + ' 线路播放中...', 'success');
+  } else {
+    toast('播放中... 如果失败请切换线路', 'info');
+  }
+}
+
+/* ═══════════════ History ═══════════════ */
 function saveHistory(url) {
   var h = getHistory();
   h = h.filter(function(x) { return x.url !== url; });
   h.unshift({ url: url, platform: detectPlatform(url), time: new Date().toLocaleString('zh-CN') });
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(0, 20)));
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(0, 20))); } catch(e) {}
 }
 
 function getHistory() {
@@ -391,22 +895,121 @@ function getHistory() {
 function renderHistory() {
   var h = getHistory();
   if (!h.length) {
-    historyList.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:8px 0">暂无播放记录</div>';
+    historyList.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:8px 0">暂无播放记录</div>';
     return;
   }
   historyList.innerHTML = h.map(function(x) {
     return '<div class="history-item">' +
-      '<span class="platform-tag">' + x.platform + '</span>' +
-      '<span class="url-text" title="' + esc(x.url) + '">' + esc(x.url) + '</span>' +
-      '<span style="font-size:11px;color:#888;white-space:nowrap">' + x.time + '</span>' +
-      '<button class="replay-btn" data-url="' + esc(x.url) + '">重播</button>' +
+      '<span class="platform-tag">' + escHtml(x.platform) + '</span>' +
+      '<span class="url-text" title="' + escAttr(x.url) + '">' + escHtml(x.url) + '</span>' +
+      '<span style="font-size:11px;color:var(--text-muted);white-space:nowrap">' + escHtml(x.time) + '</span>' +
+      '<button class="replay-btn" data-url="' + escAttr(x.url) + '">重播</button>' +
     '</div>';
   }).join('');
 }
 
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escHtml(s)  { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s)  { return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function updateClearBtn() {
+  btnClearInput.classList.toggle('visible', !!urlInput.value.trim());
+}
+
+/* ═══════════════ Keyboard ═══════════════ */
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.activeElement === urlInput && !e.shiftKey && !e.ctrlKey) {
+    e.preventDefault(); play(); return;
+  }
+  if (e.key === 'Escape' && document.activeElement === urlInput) {
+    urlInput.value = ''; updateClearBtn(); urlInput.focus(); return;
+  }
+});
+
+urlInput.addEventListener('paste', function() {
+  setTimeout(function() {
+    updateClearBtn();
+    var url = urlInput.value.trim();
+    if (url && detectPlatform(url) !== '未知') {
+      toast('识别到 ' + detectPlatform(url) + ' 链接，按 Enter 播放', 'info');
+    }
+  }, 50);
+});
+
+/* ═══════════════ Init ═══════════════ */
+function init() {
+  initTheme();
+  applyDnsPrefetch();
+  loadFailCounts();
+
+  try {
+    var savedApi = localStorage.getItem(API_KEY);
+    if (savedApi) currentApi = savedApi;
+  } catch(e) {}
+
+  renderApiTags();
+
+  getSpeeds().then(function() {
+    try {
+      if (!localStorage.getItem(API_KEY)) {
+        var fastest = getFastestApiUrl();
+        if (fastest) { currentApi = fastest; localStorage.setItem(API_KEY, currentApi); renderApiTags(); }
+      }
+    } catch(e) {}
+  });
+
+  /* Events */
+  apiLines.addEventListener('click', function(e) {
+    var tag = e.target.closest('.route-card');
+    if (!tag) return;
+    currentApi = tag.dataset.api;
+    try { localStorage.setItem(API_KEY, currentApi); } catch(e) {}
+    renderApiTags();
+  });
+
+  apiLines.addEventListener('contextmenu', function(e) {
+    var tag = e.target.closest('.route-card');
+    if (!tag) return;
+    e.preventDefault();
+    currentApi = tag.dataset.api;
+    markLineFailed();
+  });
+
+  btnRespeed.addEventListener('click', refreshSpeeds);
+  speedGlobalDot.addEventListener('dblclick', refreshSpeeds);
+  btnPlay.addEventListener('click', play);
+  btnClearInput.addEventListener('click', function() { urlInput.value = ''; urlInput.focus(); updateClearBtn(); });
+  urlInput.addEventListener('input', updateClearBtn);
+  btnClearHistory.addEventListener('click', function() {
+    try { localStorage.removeItem(HISTORY_KEY); } catch(e) {}
+    renderHistory(); toast('播放历史已清空', 'info');
+  });
+  historyList.addEventListener('click', function(e) {
+    var btn = e.target.closest('.replay-btn');
+    if (btn) { urlInput.value = btn.dataset.url; play(); }
+  });
+}
+
+function refreshSpeeds() {
+  if (isProbing) return;
+  try { localStorage.removeItem(SPEED_CACHE_KEY); } catch(e) {}
+  speedCache = {};
+  speedGlobalDot.className = 'speed-dot pending';
+  speedGlobalText.textContent = '重新测速中...';
+  renderApiTags();
+  toast('正在重新检测 ' + apiList.length + ' 条线路...', 'info');
+  getSpeeds().then(function() {
+    var online = 0;
+    for (var i = 0; i < apiList.length; i++) { if (getLineLatency(apiList[i].url) !== null) online++; }
+    var fastest = getFastestApiUrl();
+    if (fastest) { currentApi = fastest; try { localStorage.setItem(API_KEY, currentApi); } catch(e) {} renderApiTags(); }
+    toast('测速完成：' + online + '/' + apiList.length + ' 条在线', 'success');
+  });
+}
 
 init();
+
+// background sync: fetch latest api-lines from GitHub (cache 1h, non-blocking)
+fetchLatestApiLines();
 </script>
 </body>
 </html>

@@ -11,7 +11,7 @@
 
 ### 🎯 方式B：PotPlayer 边播边看（画质更好）
 ```batch
-cd /d d:\Lu\vip-video-resources
+cd /d d:\vip_free\vip-video-resources
 
 :: 默认线路1，播不了换线路 (1-9)
 stream.cmd "https://v.qq.com/x/cover/xxx.html"
