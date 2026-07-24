@@ -1,1 +1,5 @@
-CreateObject("WScript.Shell").Run "msedge file:///d:/vip_free/vip-video-resources/vip-player.html", 1, False
+Set objShell = CreateObject("WScript.Shell")
+scriptDir = objShell.CurrentDirectory
+htmlPath = scriptDir & "\vip-player.html"
+Set objShellApp = CreateObject("Shell.Application")
+objShellApp.Open htmlPath

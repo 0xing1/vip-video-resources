@@ -14,7 +14,7 @@
 // @match        https://www.pptv.com/*
 // @match        https://www.1905.com/*
 // @match        https://www.le.com/*
-// @icon         https://www.google.com/s2/favicons?domain=v.qq.com
+// @icon         https://v.qq.com/favicon.ico
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_registerMenuCommand

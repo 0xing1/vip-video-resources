@@ -10,6 +10,9 @@ tools/
 # 本地路径配置（不提交，每人不同）
 config.json
 
+# CI 构建产物
+_site/
+
 # Python 缓存
 __pycache__/
 *.pyc

@@ -40,15 +40,18 @@ vip-video-resources/
 ├── info.cmd                 ← 查看视频有哪些画质
 ├── you-get.cmd              ← you-get 完整下载功能
 ├── n_m3u8dl.cmd             ← N_m3u8DL-RE 下载（支持4K）
-├── downloads/               ← 下载的视频保存位置
-├── cache/                   ← 工具缓存
+├── setup.cmd                ← 首次使用配置向导
+├── downloads/               ← （运行时自动创建）下载的视频
+├── cache/                   ← （运行时自动创建）工具缓存
 ├── tools/
-│   ├── N_m3u8DL-RE/        ← N_m3u8DL-RE v0.6.0-beta
-│   └── ffmpeg/             ← ffmpeg
+│   ├── N_m3u8DL-RE/        ← （需手动下载）N_m3u8DL-RE v0.6.0-beta
+│   └── ffmpeg/             ← （需手动下载）ffmpeg
 ├── README.md
 ├── self-parse-guide.md
 └── .gitignore
 ```
+
+> ⚠️ 带 `（运行时自动创建）` 和 `（需手动下载）` 的目录不在仓库中，clone 后需按需创建。
 
 ---
 

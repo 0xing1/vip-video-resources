@@ -23,6 +23,6 @@ echo 📁 下载目录: %SAVE_DIR%
 echo 📁 临时目录: %TMP_DIR%
 echo.
 
-"%EXE%" "%*" --save-dir "%SAVE_DIR%" --tmp-dir "%TMP_DIR%"
+"%EXE%" --save-dir "%SAVE_DIR%" --tmp-dir "%TMP_DIR%" %*
 
 endlocal

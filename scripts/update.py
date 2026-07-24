@@ -138,25 +138,49 @@ def step3_merge_and_generate(upstream_lines: list[dict]) -> bool:
 
 
 def step4_health_check():
-    """健康检查"""
+    """健康检查，仅在 status/failCount 变化时写回 api-lines.json"""
     log("[4/4] 线路健康检查 …")
     data = load_json()
     alive, dead = 0, 0
+    status_changed = False
+    now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     for line in data["lines"]:
         test_url = line["url"] + "https://v.qq.com"
+        old_status = line.get("status")
+        old_fail_count = line.get("failCount", 0)
+        line["lastChecked"] = now_utc
         try:
             req = Request(test_url, headers={"User-Agent": "Mozilla/5.0"}, method="GET")
             with urlopen(req, timeout=10) as resp:
                 resp.read()
             alive += 1
+            line["status"] = "ok"
+            line["failCount"] = 0
             log(f"  ✓ 线路{line['id']} {line['name']} OK")
         except Exception:
             dead += 1
+            line["status"] = "dead"
+            line["failCount"] = line.get("failCount", 0) + 1
             log(f"  ✗ 线路{line['id']} {line['name']} 超时/不可用")
+        if old_status != line["status"] or old_fail_count != line["failCount"]:
+            status_changed = True
 
     total = alive + dead
     log(f"  结果: {alive}/{total} 可用, {dead}/{total} 不可达")
+
+    # 仅在状态变化时写回，避免 lastChecked 导致空提交
+    if status_changed:
+        save_json(data)
+        change_detail = []
+        if dead > 0:
+            dead_names = [l["name"] for l in data["lines"] if l.get("status") == "dead"]
+            change_detail.append(f"{dead} 条失效: {', '.join(dead_names)}")
+        revived = [l["name"] for l in data["lines"] if l.get("status") == "ok" and l.get("failCount", 0) == 0]
+        if revived and any(l.get("status") == "ok" for l in data["lines"]):
+            log(f"  状态已更新: {'; '.join(change_detail)}" if change_detail else "  状态已更新")
+    else:
+        log("  状态无变化，跳过写入")
 
 
 def main():
