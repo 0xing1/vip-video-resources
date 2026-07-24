@@ -18,10 +18,24 @@ if "%~1"=="" (
     exit /b 1
 )
 
-set "POTPLAYER=D:\DAUM\PotPlayer\PotPlayerMini64.exe"
-set "CONFIG=%~dp0api-lines.json"
+set "CONFIG=%~dp0config.json"
+set "JSON_CONFIG=%~dp0api-lines.json"
 
+:: ── 加载 config.json ──
 if not exist "%CONFIG%" (
+    echo ❌ config.json 不存在！请先运行 setup.cmd 配置环境
+    pause
+    exit /b 1
+)
+for /f "delims=" %%a in ('powershell -NoProfile -Command "(Get-Content '%CONFIG%' -Raw | ConvertFrom-Json).potplayer" 2^>nul') do set "POTPLAYER=%%a"
+
+if "%POTPLAYER%"=="" (
+    echo ❌ config.json 中未配置 PotPlayer 路径
+    echo 请编辑 config.json 或运行 setup.cmd 重新配置
+    exit /b 1
+)
+
+if not exist "%JSON_CONFIG%" (
     echo ❌ 配置文件 api-lines.json 不存在！
     exit /b 1
 )
@@ -31,7 +45,7 @@ if "%LINE%"=="" set "LINE=1"
 
 :: ── 用 PowerShell 从 JSON 提取指定线路的 URL ──
 for /f "delims=" %%a in ('powershell -NoProfile -Command ^
-  "$json = Get-Content '%CONFIG%' -Raw | ConvertFrom-Json; $line = $json.lines | Where-Object { $_.id -eq %LINE% }; if ($line) { Write-Output $line.url } else { Write-Output '' }" 2^>nul') do set "API_URL=%%a"
+  "$json = Get-Content '%JSON_CONFIG%' -Raw | ConvertFrom-Json; $line = $json.lines | Where-Object { $_.id -eq %LINE% }; if ($line) { Write-Output $line.url } else { Write-Output '' }" 2^>nul') do set "API_URL=%%a"
 
 if "%API_URL%"=="" (
     echo ❌ 无效线路号: %LINE%

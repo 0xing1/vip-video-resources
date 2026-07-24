@@ -7,6 +7,9 @@ cache/
 # 工具二进制（需手动下载）
 tools/
 
+# 本地路径配置（不提交，每人不同）
+config.json
+
 # Python 缓存
 __pycache__/
 *.pyc

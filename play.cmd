@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-setlocal
+setlocal enabledelayedexpansion
 
 :: ── 用法: play.cmd <视频链接> [画质] ──
 :: ── 示例: play.cmd "https://v.qq.com/x/cover/xxx.html" 1080P ──
@@ -17,9 +17,22 @@ if "%~1"=="" (
     exit /b 1
 )
 
+set "CONFIG=%~dp0config.json"
 set "PROJECT_DIR=%~dp0"
-set "PYTHON=D:\Python\Python313\python.exe"
-set "YOU_GET=D:\Python\Python313\Scripts\you-get.exe"
+
+:: ── 加载 config.json ──
+if not exist "%CONFIG%" (
+    echo ❌ config.json 不存在！请先运行 setup.cmd 配置环境
+    pause
+    exit /b 1
+)
+for /f "delims=" %%a in ('powershell -NoProfile -Command "(Get-Content '%CONFIG%' -Raw | ConvertFrom-Json).python" 2^>nul') do set "PYTHON=%%a"
+
+if "%PYTHON%"=="" set "PYTHON=python"
+
+set "YOU_GET=%PYTHON%\..\Scripts\you-get.exe"
+for %%i in ("%YOU_GET%") do set "YOU_GET=%%~fi"
+
 set "OUTPUT_DIR=%PROJECT_DIR%downloads"
 set "CACHE_DIR=%PROJECT_DIR%cache\you-get"
 

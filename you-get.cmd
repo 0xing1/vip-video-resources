@@ -1,11 +1,24 @@
 @echo off
 chcp 65001 >nul
-setlocal
+setlocal enabledelayedexpansion
 
-:: ── 路径配置 ──
+:: ── you-get 便捷启动 ──
+
+set "CONFIG=%~dp0config.json"
 set "PROJECT_DIR=%~dp0"
-set "PYTHON=D:\Python\Python313\python.exe"
-set "YOU_GET=D:\Python\Python313\Scripts\you-get.exe"
+
+:: ── 加载 config.json ──
+if not exist "%CONFIG%" (
+    echo ❌ config.json 不存在！请先运行 setup.cmd 配置环境
+    pause
+    exit /b 1
+)
+for /f "delims=" %%a in ('powershell -NoProfile -Command "(Get-Content '%CONFIG%' -Raw | ConvertFrom-Json).python" 2^>nul') do set "PYTHON=%%a"
+
+if "%PYTHON%"=="" set "PYTHON=python"
+
+set "YOU_GET=%PYTHON%\..\Scripts\you-get.exe"
+for %%i in ("%YOU_GET%") do set "YOU_GET=%%~fi"
 
 :: ── 固定输出目录到项目文件夹 ──
 set "OUTPUT_DIR=%PROJECT_DIR%downloads"
