@@ -7,8 +7,8 @@ VIP 视频解析 — 自动更新脚本 (CI / 本地通用)
   1. 升级 you-get / yt-dlp
   2. 拉取上游 HTML，提取新 API 线路
   3. 合并到 api-lines.json（去重）
-  4. 重新生成 api-lines.js
-  5. 健康检查所有线路
+  4. 健康检查所有线路 → 写回 api-lines.json
+  5. 重新生成 api-lines.js（含健康状态字段）
 
 退出码: 0 = 无变更, 10 = 有变更需提交
 """
@@ -27,7 +27,7 @@ UPSTREAM_SOURCES = [
     "https://raw.githubusercontent.com/Awle007/xshyunvip-video-player/main/index.html",
 ]
 
-URL_PATTERN = re.compile(r'https?://[^"\'\s<>]+')
+URL_PATTERN = re.compile(r'https?://[^"'\s<>]+')
 API_PATTERN = re.compile(r'(jiexi|parse|analysis|json|m3u8|jx\.|player)')
 SOCIAL_PATTERN = re.compile(r'(qq\.com|weixin|wechat|github\.com|twitter\.com|facebook\.com|weibo\.com)')
 
@@ -53,7 +53,7 @@ def save_json(data: dict):
 def step1_upgrade_tools():
     """升级 you-get / yt-dlp"""
     log("=" * 50)
-    log("[1/4] 升级 you-get / yt-dlp …")
+    log("[1/5] 升级 you-get / yt-dlp …")
     try:
         subprocess.run(
             [sys.executable, "-m", "pip", "install", "--upgrade", "you-get", "yt-dlp", "--quiet"],
@@ -66,7 +66,7 @@ def step1_upgrade_tools():
 
 def step2_fetch_upstream() -> list[dict]:
     """从上游 HTML 提取 API URL"""
-    log("[2/4] 拉取上游 …")
+    log("[2/5] 拉取上游 …")
     found_urls = []
     for src in UPSTREAM_SOURCES:
         try:
@@ -95,15 +95,14 @@ def step2_fetch_upstream() -> list[dict]:
     return lines
 
 
-def step3_merge_and_generate(upstream_lines: list[dict]) -> bool:
-    """合并上游线路，生成 api-lines.js。返回是否有变更"""
-    log("[3/4] 合并 & 生成 api-lines.js …")
+def step3_merge_upstream(upstream_lines: list[dict]) -> bool:
+    """合并上游线路到 api-lines.json。返回是否有新线路加入"""
+    log("[3/5] 合并上游线路 …")
 
     data = load_json()
     new_count = 0
 
     for ul in upstream_lines:
-        # 跳过已存在的 URL
         clean_url = ul["url"].rstrip("/")
         exists = any(clean_url == l["url"].rstrip("/") for l in data["lines"])
         if not exists:
@@ -116,30 +115,34 @@ def step3_merge_and_generate(upstream_lines: list[dict]) -> bool:
         save_json(data)
     else:
         log("  无新线路")
+    return new_count > 0
 
-    # 只在 JSON 实际有变更时才重新生成 JS（避免时间戳导致空提交）
-    if new_count > 0:
-        lines_json = ",\n".join(
-            f'  {{"id": {l["id"]}, "name": "{l["name"]}", "url": "{l["url"]}"}}'
-            for l in data["lines"]
-        )
-        new_js = (
-            f"// auto-generated {datetime.now().strftime('%Y-%m-%d %H:%M')}\n"
-            f"// edit api-lines.json, then run update.cmd or scripts/update.py\n"
-            f"window.__API_LINES__ = [\n{lines_json}\n];\n"
-        )
-        with open(JS_PATH, "w", encoding="utf-8") as f:
-            f.write(new_js)
-        log("  ✓ api-lines.js 已更新")
-        return True
-    else:
-        log("  ✓ api-lines.js 无需更新")
-        return False
+
+def generate_js(data: dict | None = None):
+    """从 api-lines.json 生成 api-lines.js（含健康状态字段）"""
+    if data is None:
+        data = load_json()
+
+    lines_json = ",\n".join(
+        f'  {{"id": {l["id"]}, "name": "{l["name"]}", "url": "{l["url"]}",'
+        f' "status": "{l.get("status", "ok")}",'
+        f' "lastChecked": {json.dumps(l.get("lastChecked"))},'
+        f' "failCount": {l.get("failCount", 0)}}}'
+        for l in data["lines"]
+    )
+    new_js = (
+        f"// auto-generated {datetime.now().strftime('%Y-%m-%d %H:%M')}\n"
+        f"// edit api-lines.json, then run update.cmd or scripts/update.py\n"
+        f"window.__API_LINES__ = [\n{lines_json}\n];\n"
+    )
+    with open(JS_PATH, "w", encoding="utf-8") as f:
+        f.write(new_js)
+    log("  ✓ api-lines.js 已更新")
 
 
 def step4_health_check():
-    """健康检查，仅在 status/failCount 变化时写回 api-lines.json"""
-    log("[4/4] 线路健康检查 …")
+    """健康检查，仅在 status/failCount 变化时写回 api-lines.json。返回是否有状态变更"""
+    log("[4/5] 线路健康检查 …")
     data = load_json()
     alive, dead = 0, 0
     status_changed = False
@@ -169,18 +172,27 @@ def step4_health_check():
     total = alive + dead
     log(f"  结果: {alive}/{total} 可用, {dead}/{total} 不可达")
 
-    # 仅在状态变化时写回，避免 lastChecked 导致空提交
     if status_changed:
         save_json(data)
-        change_detail = []
-        if dead > 0:
-            dead_names = [l["name"] for l in data["lines"] if l.get("status") == "dead"]
-            change_detail.append(f"{dead} 条失效: {', '.join(dead_names)}")
-        revived = [l["name"] for l in data["lines"] if l.get("status") == "ok" and l.get("failCount", 0) == 0]
-        if revived and any(l.get("status") == "ok" for l in data["lines"]):
-            log(f"  状态已更新: {'; '.join(change_detail)}" if change_detail else "  状态已更新")
+        log(f"  状态已更新（{alive} 活 / {dead} 死）")
     else:
         log("  状态无变化，跳过写入")
+    return status_changed
+
+
+def step5_regenerate_js(json_changed: bool, health_changed: bool) -> bool:
+    """在 JSON 有变更后重新生成 api-lines.js。返回是否重新生成"""
+    log("[5/5] 生成 api-lines.js …")
+    json_mtime = os.path.getmtime(JSON_PATH)
+    js_mtime = os.path.getmtime(JS_PATH) if os.path.exists(JS_PATH) else 0
+    needs_regen = json_changed or health_changed or json_mtime > js_mtime
+
+    if needs_regen:
+        generate_js()
+        return True
+    else:
+        log("  ✓ api-lines.js 无需更新")
+        return False
 
 
 def main():
@@ -190,10 +202,12 @@ def main():
 
     step1_upgrade_tools()
     upstream_lines = step2_fetch_upstream()
-    changed = step3_merge_and_generate(upstream_lines)
-    step4_health_check()
+    json_changed = step3_merge_upstream(upstream_lines)
+    health_changed = step4_health_check()
+    js_changed = step5_regenerate_js(json_changed, health_changed)
 
     log("完成")
+    changed = json_changed or js_changed
     if changed:
         log(">>> 检测到变更 <<<")
     else:

@@ -262,6 +262,14 @@ body::before {
   width: 3px; background: var(--accent);
 }
 .route-card.fast-line { border-color: rgba(90,158,107,.4); }
+.route-card.dead-line { opacity: .45; }
+.route-card.dead-line:hover { opacity: .7; }
+.route-card.dead-line::after {
+  content: '⚠';
+  font-size: 9px;
+  margin-left: 4px;
+  opacity: .6;
+}
 
 .speed-badge {
   font-size: 10px; border-radius: 8px; padding: 1px 6px;
@@ -435,7 +443,7 @@ body::before {
     <!-- Speed + API Lines -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;margin-bottom:8px">
       <div class="speed-status" style="margin-top:0;margin-bottom:0">
-        <span style="font-size:11px;color:var(--text-muted);font-family:'Consolas','Courier New',monospace">ROUTES</span>
+        <span style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace">ROUTES</span>
         <span class="speed-dot pending" id="speedGlobalDot" title="测速中"></span>
         <span id="speedGlobalText" style="font-size:11px;color:var(--text-muted)"></span>
       </div>
@@ -443,7 +451,7 @@ body::before {
     </div>
     <div class="api-lines" id="apiLines"></div>
 
-    <div style="margin-top:14px;font-size:11px;color:var(--text-muted);font-family:'Consolas','Courier New',monospace">快捷跳转：</div>
+    <div style="margin-top:14px;font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace">快捷跳转：</div>
     <div class="quick-links">
       <a class="quick-link" href="https://v.qq.com" target="_blank" rel="noopener">腾讯视频</a>
       <a class="quick-link" href="https://www.iqiyi.com" target="_blank" rel="noopener">爱奇艺</a>
@@ -797,16 +805,27 @@ function renderApiTags() {
   }
   var hasAnySpeed = Object.keys(speedCache).length > 0;
 
-  apiLines.innerHTML = apiList.map(function(line) {
+  // 排序：在线优先 → 失效排后，各自保持原始 ID 顺序
+  var sorted = apiList.slice().sort(function(a, b) {
+    var aDead = a.status === 'dead' ? 1 : 0;
+    var bDead = b.status === 'dead' ? 1 : 0;
+    if (aDead !== bDead) return aDead - bDead;
+    return a.id - b.id;
+  });
+
+  apiLines.innerHTML = sorted.map(function(line) {
     var origin = getOrigin(line.url);
     var latency = speedCache[origin];
     var tier = speedTier(latency);
-    var fail = failCounts[origin] || 0;
+    var localFail = failCounts[origin] || 0;
     var isActive = line.url === currentApi;
+    var isDead = line.status === 'dead';
+    var ciFailCount = line.failCount || 0;
 
     var cls = 'route-card';
     if (isActive) cls += ' active';
     if (tier === 1 && !isActive) cls += ' fast-line';
+    if (isDead && !isActive) cls += ' dead-line';
 
     var badgeHtml = '';
     if (hasAnySpeed) {
@@ -815,7 +834,14 @@ function renderApiTags() {
       badgeHtml = '<span class="speed-dot pending" style="width:6px;height:6px" title="测速中"></span>';
     }
 
-    var failHtml = fail > 0 ? '<span class="fail-count">' + fail + '</span>' : '';
+    var failHtml = '';
+    if (localFail > 0) {
+      failHtml = '<span class="fail-count">' + localFail + '</span>';
+    }
+    // CI 健康检查结果：失效线路显示警告
+    if (isDead && ciFailCount > 0) {
+      failHtml += '<span class="fail-count" style="background:rgba(201,162,39,.15);color:var(--warning)" title="CI健康检查连续' + ciFailCount + '次不可达">⚠' + ciFailCount + '</span>';
+    }
 
     return '<div class="' + cls + '" data-api="' + line.url + '" data-origin="' + origin + '">' +
       '<span>' + line.id + '. ' + line.name + '</span>' +
