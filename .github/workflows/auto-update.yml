@@ -24,9 +24,17 @@ jobs:
         with:
           python-version: '3.13'
 
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('scripts/update.py') }}
+          restore-keys: |
+            pip-${{ runner.os }}-
+
       - name: Run auto-update script
         run: python scripts/update.py
-        continue-on-error: true
+        timeout-minutes: 5
 
       - name: Check for changes
         id: changes
@@ -72,6 +80,10 @@ jobs:
           cp vip-player.html _site/index.html
           cp api-lines.js _site/
           cp vip-player.ico _site/ 2>/dev/null || true
+          # Integrity check
+          if [ ! -s _site/index.html ]; then echo "ERROR: index.html missing or empty"; exit 1; fi
+          if [ ! -s _site/api-lines.js ]; then echo "ERROR: api-lines.js missing or empty"; exit 1; fi
+          echo "✓ Deploy directory OK ($(wc -c < _site/index.html) bytes index, $(wc -c < _site/api-lines.js) bytes api-lines)"
 
       - name: Upload Pages artifact
         if: steps.deploy_check.outputs.should_deploy == 'true'
