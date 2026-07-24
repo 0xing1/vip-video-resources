@@ -23,11 +23,13 @@ JSON_PATH  = os.path.join(PROJECT_DIR, "api-lines.json")
 JS_PATH    = os.path.join(PROJECT_DIR, "api-lines.js")
 LOG_PATH   = os.path.join(PROJECT_DIR, "cache", "update.log")
 
+AUTO_DELETE_THRESHOLD = 3  # 连续失效 ≥N 次自动删除
+
 UPSTREAM_SOURCES = [
     "https://raw.githubusercontent.com/Awle007/xshyunvip-video-player/main/index.html",
 ]
 
-URL_PATTERN = re.compile(r'https?://[^"'\s<>]+')
+URL_PATTERN = re.compile(r'https?://[^"\'\s<>]+')
 API_PATTERN = re.compile(r'(jiexi|parse|analysis|json|m3u8|jx\.|player)')
 SOCIAL_PATTERN = re.compile(r'(qq\.com|weixin|wechat|github\.com|twitter\.com|facebook\.com|weibo\.com)')
 
@@ -141,7 +143,7 @@ def generate_js(data: dict | None = None):
 
 
 def step4_health_check():
-    """健康检查，仅在 status/failCount 变化时写回 api-lines.json。返回是否有状态变更"""
+    """健康检查 + 自动删除长期失效线路。返回是否有变更"""
     log("[4/5] 线路健康检查 …")
     data = load_json()
     alive, dead = 0, 0
@@ -165,19 +167,37 @@ def step4_health_check():
             dead += 1
             line["status"] = "dead"
             line["failCount"] = line.get("failCount", 0) + 1
-            log(f"  ✗ 线路{line['id']} {line['name']} 超时/不可用")
+            fc = line["failCount"]
+            if fc >= AUTO_DELETE_THRESHOLD:
+                log(f"  ✗ 线路{line['id']} {line['name']} 超时 (连续{fc}次 → 自动删除)")
+            elif fc == AUTO_DELETE_THRESHOLD - 1:
+                log(f"  ✗ 线路{line['id']} {line['name']} 超时 (连续{fc}次，⚠ 再失败1次删除)")
+            else:
+                log(f"  ✗ 线路{line['id']} {line['name']} 超时 (连续{fc}次)")
         if old_status != line["status"] or old_fail_count != line["failCount"]:
             status_changed = True
 
-    total = alive + dead
-    log(f"  结果: {alive}/{total} 可用, {dead}/{total} 不可达")
+    # ── 自动删除连续失效 ≥阈值的线路 ──
+    before = len(data["lines"])
+    removed = [l for l in data["lines"] if l.get("failCount", 0) >= AUTO_DELETE_THRESHOLD]
+    data["lines"] = [l for l in data["lines"] if l.get("failCount", 0) < AUTO_DELETE_THRESHOLD]
+    deleted = before - len(data["lines"])
 
-    if status_changed:
+    if deleted > 0:
+        for i, line in enumerate(data["lines"]):
+            line["id"] = i + 1  # 重新编号
+        log(f"  🗑 自动删除 {deleted} 条长期失效线路:")
+        for dl in removed:
+            log(f"     - [{dl['id']}] {dl['name']} → {dl['url']}")
+
+    total = alive + dead
+    log(f"  结果: {alive}/{total} 可用, {dead}/{total} 不可达, {deleted} 已删除 → 剩余 {len(data['lines'])} 条")
+
+    if status_changed or deleted > 0:
         save_json(data)
-        log(f"  状态已更新（{alive} 活 / {dead} 死）")
     else:
         log("  状态无变化，跳过写入")
-    return status_changed
+    return status_changed or deleted > 0
 
 
 def step5_regenerate_js(json_changed: bool, health_changed: bool) -> bool:
