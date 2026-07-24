@@ -6,9 +6,7 @@
 <meta name="description" content="VIP视频解析-免费在线播放，支持腾讯视频、爱奇艺、优酷、芒果TV、B站等平台">
 <title>VIP · 影流解析</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Fonts: 使用系统字体，无外部依赖 -->
 <style>
 /* ═══════════════ Cinema Dark Theme ═══════════════ */
 :root {
@@ -51,7 +49,7 @@ html, body {
   width: 100%; min-height: 100vh;
   background: var(--bg-deep);
   color: var(--text-primary);
-  font-family: 'JetBrains Mono', 'Noto Serif SC', monospace;
+  font-family: 'Consolas', 'Courier New', 'Noto Serif SC', monospace;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -62,7 +60,7 @@ body::before {
   position: fixed; inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
   background-size: 128px 128px;
-  pointer-events: none; z-index: 9999;
+  pointer-events: none; z-index: 0;
 }
 /* 背景光晕 */
 .ambient-glow {
@@ -79,8 +77,8 @@ body::before {
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
 /* 字体 */
-.font-display { font-family: 'Playfair Display', 'Noto Serif SC', serif; }
-.font-mono { font-family: 'JetBrains Mono', monospace; }
+.font-display { font-family: 'Georgia', 'Noto Serif SC', serif; }
+.font-mono { font-family: 'Consolas', 'Courier New', monospace; }
 
 /* 毛玻璃面板 */
 .glass {
@@ -107,17 +105,17 @@ body::before {
   background: linear-gradient(135deg, var(--accent), #8b6914);
   display: flex; align-items: center; justify-content: center;
   color: #0a0a0b; font-weight: 700; font-size: 14px;
-  font-family: 'Playfair Display', serif;
+  font-family: 'Georgia', serif;
   flex-shrink: 0;
 }
 .logo-text {
-  font-family: 'Playfair Display', 'Noto Serif SC', serif;
+  font-family: 'Georgia', 'Noto Serif SC', serif;
   font-size: 18px; font-weight: 700;
   color: var(--text-primary);
 }
 .logo-sub {
   font-size: 12px; color: var(--text-muted);
-  font-family: 'JetBrains Mono', monospace; font-weight: 400;
+  font-family: 'Consolas', 'Courier New', monospace; font-weight: 400;
 }
 .header-right { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text-secondary); }
 
@@ -150,7 +148,7 @@ body::before {
 }
 .section-label {
   font-size: 11px; color: var(--accent); letter-spacing: 0.08em;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Consolas', 'Courier New', monospace;
   margin-bottom: 6px;
 }
 .input-card .subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 18px; }
@@ -162,7 +160,7 @@ body::before {
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: var(--input-bg); color: var(--text-primary);
-  font-size: 13px; font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; font-family: 'Consolas', 'Courier New', monospace;
   outline: none; letter-spacing: 0.02em;
   transition: border-color .25s, box-shadow .25s;
 }
@@ -190,7 +188,7 @@ body::before {
   padding: 13px 28px; border-radius: var(--radius-md); border: none;
   background: linear-gradient(135deg, var(--accent), #a08020);
   color: #0a0a0b; font-size: 14px; font-weight: 600;
-  font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em;
+  font-family: 'Consolas', 'Courier New', monospace; letter-spacing: 0.05em;
   cursor: pointer; white-space: nowrap;
   transition: all .25s; position: relative; overflow: hidden;
 }
@@ -228,7 +226,7 @@ body::before {
   font-size: 11px; padding: 4px 12px; border-radius: 12px;
   border: 1px solid var(--border); background: transparent;
   color: var(--text-secondary); cursor: pointer;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Consolas', 'Courier New', monospace;
   transition: all .15s;
 }
 .btn-respeed:hover { border-color: var(--accent); color: var(--accent); }
@@ -286,7 +284,7 @@ body::before {
   padding: 5px 12px; border-radius: 6px; font-size: 11px;
   background: var(--tag-bg); border: 1px solid var(--border);
   color: var(--text-secondary); text-decoration: none;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Consolas', 'Courier New', monospace;
   transition: all .15s;
 }
 .quick-link:hover { border-color: var(--accent); color: var(--accent); }
@@ -307,7 +305,7 @@ body::before {
 .history-item:hover { border-color: var(--border); background: rgba(255,255,255,0.02); }
 .history-item .url-text {
   flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: var(--text-secondary); font-family: 'Consolas', 'Courier New', monospace; font-size: 12px;
 }
 .history-item .platform-tag {
   padding: 2px 8px; border-radius: 4px; font-size: 11px;
@@ -354,7 +352,7 @@ body::before {
   animation: toast-in .3s ease;
   max-width: 380px;
   display: flex; align-items: center; gap: 10px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Consolas', 'Courier New', monospace;
 }
 .toast.toast-out { animation: toast-out .25s ease forwards; }
 .toast-success { border-left: 3px solid var(--success); }
@@ -437,7 +435,7 @@ body::before {
     <!-- Speed + API Lines -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;margin-bottom:8px">
       <div class="speed-status" style="margin-top:0;margin-bottom:0">
-        <span style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace">ROUTES</span>
+        <span style="font-size:11px;color:var(--text-muted);font-family:'Consolas','Courier New',monospace">ROUTES</span>
         <span class="speed-dot pending" id="speedGlobalDot" title="测速中"></span>
         <span id="speedGlobalText" style="font-size:11px;color:var(--text-muted)"></span>
       </div>
@@ -445,7 +443,7 @@ body::before {
     </div>
     <div class="api-lines" id="apiLines"></div>
 
-    <div style="margin-top:14px;font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace">快捷跳转：</div>
+    <div style="margin-top:14px;font-size:11px;color:var(--text-muted);font-family:'Consolas','Courier New',monospace">快捷跳转：</div>
     <div class="quick-links">
       <a class="quick-link" href="https://v.qq.com" target="_blank" rel="noopener">腾讯视频</a>
       <a class="quick-link" href="https://www.iqiyi.com" target="_blank" rel="noopener">爱奇艺</a>
