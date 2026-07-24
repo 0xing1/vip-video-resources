@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         VIP视频免费解析跳转
 // @namespace    https://github.com/0xing1/vip-video-resources
-// @version      1.0.0
-// @description  在VIP视频平台页面注入浮动按钮，一键跳转到免费解析播放
+// @version      1.1.0
+// @description  在VIP视频平台页面注入浮动按钮，一键跳转到免费解析播放（线路自动从 GitHub 同步）
 // @author       0xing1
 // @match        https://v.qq.com/*
 // @match        https://www.iqiyi.com/*
@@ -18,66 +18,160 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_registerMenuCommand
+// @grant        GM_getResourceText
+// @grant        GM_xmlhttpRequest
+// @resource     LINES https://raw.githubusercontent.com/0xing1/vip-video-resources/main/api-lines.json
+// @downloadURL  https://raw.githubusercontent.com/0xing1/vip-video-resources/main/tampermonkey/vip-parser-jump.user.js
+// @updateURL    https://raw.githubusercontent.com/0xing1/vip-video-resources/main/tampermonkey/vip-parser-jump.user.js
 // @run-at       document-end
 // ==/UserScript==
 
 (function () {
   'use strict';
 
-  // ── 解析线路配置（与 api-lines.json 保持同步） ──
-  const API_LINES = [
+  // ── 应急线路（仅当网络拉取失败时使用，至少保留 5 条最稳定线路） ──
+  const FALLBACK_LINES = [
     { id: 1,  name: 'playerjy',    url: 'https://jx.playerjy.com/?url=' },
-    { id: 2,  name: '夜幕',         url: 'https://www.yemu.xyz/?url=' },
-    { id: 3,  name: '极速解析',      url: 'https://jx.2s0.cn/player/?url=' },
-    { id: 4,  name: 'Node解析',     url: 'https://jx.nodenode.dpdns.org/?url=' },
     { id: 5,  name: '爱豆',         url: 'https://jx.aidouer.net/?url=' },
-    { id: 6,  name: '789解析',      url: 'https://jiexi.789jiexi.icu:4433/?url=' },
-    { id: 7,  name: 'playm3u8',    url: 'https://www.playm3u8.cn/jiexi.php?url=' },
-    { id: 8,  name: 'Yparse',      url: 'https://jx.yparse.com/index.php?url=' },
-    { id: 9,  name: '剖元解析',      url: 'https://www.pouyun.com/?url=' },
-    { id: 10, name: 'CK',          url: 'https://www.ckplayer.vip/jiexi/?url=' },
     { id: 11, name: 'm3u8.tv',     url: 'https://jx.m3u8.tv/jiexi/?url=' },
-    { id: 12, name: 'super.playr',  url: 'https://super.playr.top/?url=' },
-    { id: 13, name: '盘古',         url: 'https://www.pangujiexi.com/jiexi/?url=' },
     { id: 14, name: '虾米解析',      url: 'https://jx.xmflv.com/?url=' },
-    { id: 15, name: '七七云',       url: 'https://jx.77flv.cc/?url=' },
-    { id: 16, name: '冰豆解析',      url: 'https://bd.jx.cn/?url=' },
-    { id: 17, name: '973解析',      url: 'https://jx.973973.xyz/?url=' },
-    { id: 18, name: 'nnxv',        url: 'https://jx.nnxv.cn/tv.php?url=' },
-    { id: 19, name: 'fongmi(JSON)',url: 'https://json.fongmi.cc/web?url=' },
     { id: 20, name: 'HLS解析',      url: 'https://jx.hls.one/?url=' },
-    { id: 21, name: '芒果专用1',     url: 'https://video.isyour.love/player/getplayer?url=' },
-    { id: 22, name: '芒果专用2',     url: 'https://im1907.top/?jx=' },
   ];
-
-  // ── 智能检测：如果本地有 vip-player.html，优先用它；否则直连 API ──
-  const LOCAL_PLAYER = 'http://127.0.0.1:5500/vip-player.html'; // VS Code Live Server
-  const USE_LOCAL = false; // 改为 true 启用本地播放器
 
   // ── 状态 ──
   const STORE_KEY = 'vip_parser_line_idx';
-  let currentIdx = GM_getValue(STORE_KEY, 0);
-  if (currentIdx >= API_LINES.length) currentIdx = 0;
+  const LINES_CACHE_KEY = 'vip_parser_lines_cache';
+  const LINES_CACHE_TS_KEY = 'vip_parser_lines_ts';
+  const CACHE_TTL = 60 * 60 * 1000; // 1 小时
+
+  let API_LINES = [];
+  let currentIdx = 0;
 
   function getCurrentApi() {
+    if (!API_LINES.length) return FALLBACK_LINES[0].url;
+    if (currentIdx >= API_LINES.length) currentIdx = 0;
     return API_LINES[currentIdx].url;
   }
 
   function getCurrentName() {
-    return `线路${API_LINES[currentIdx].id} ${API_LINES[currentIdx].name}`;
+    if (!API_LINES.length) return '应急线路';
+    if (currentIdx >= API_LINES.length) currentIdx = 0;
+    return '线路' + API_LINES[currentIdx].id + ' ' + API_LINES[currentIdx].name;
+  }
+
+  // ── 解析线路数据 ──
+  function parseLines(raw) {
+    try {
+      const data = JSON.parse(raw);
+      if (data && data.lines && data.lines.length) return data.lines;
+    } catch (e) {}
+    return null;
+  }
+
+  function loadCachedLines() {
+    try {
+      const ts = GM_getValue(LINES_CACHE_TS_KEY, 0);
+      if (Date.now() - ts < CACHE_TTL) {
+        const cached = GM_getValue(LINES_CACHE_KEY, '');
+        if (cached) {
+          const lines = parseLines(cached);
+          if (lines) return lines;
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function saveCachedLines(raw) {
+    try {
+      GM_setValue(LINES_CACHE_KEY, raw);
+      GM_setValue(LINES_CACHE_TS_KEY, Date.now());
+    } catch (e) {}
+  }
+
+  function loadLines(callback) {
+    // 1. 优先用 @resource（Tampermonkey 安装时内嵌版本）
+    try {
+      const raw = GM_getResourceText('LINES');
+      const lines = parseLines(raw);
+      if (lines) {
+        API_LINES = lines;
+        saveCachedLines(raw);
+        callback();
+        return;
+      }
+    } catch (e) {}
+
+    // 2. 尝试本地缓存
+    const cached = loadCachedLines();
+    if (cached) {
+      API_LINES = cached;
+      callback();
+      // 后台异步拉取最新版本
+      fetchLatestInBackground();
+      return;
+    }
+
+    // 3. 实时拉取
+    fetchLatest(function (lines) {
+      if (lines) {
+        API_LINES = lines;
+      } else {
+        API_LINES = FALLBACK_LINES;
+      }
+      callback();
+    });
+  }
+
+  function fetchLatestInBackground() {
+    GM_xmlhttpRequest({
+      method: 'GET',
+      url: 'https://raw.githubusercontent.com/0xing1/vip-video-resources/main/api-lines.json',
+      timeout: 5000,
+      onload: function (resp) {
+        const lines = parseLines(resp.responseText);
+        if (lines) {
+          API_LINES = lines;
+          saveCachedLines(resp.responseText);
+          if (currentIdx >= API_LINES.length) currentIdx = 0;
+          GM_setValue(STORE_KEY, currentIdx);
+          updateLabel();
+        }
+      },
+      onerror: function () {}
+    });
+  }
+
+  function fetchLatest(callback) {
+    GM_xmlhttpRequest({
+      method: 'GET',
+      url: 'https://raw.githubusercontent.com/0xing1/vip-video-resources/main/api-lines.json',
+      timeout: 8000,
+      onload: function (resp) {
+        const lines = parseLines(resp.responseText);
+        if (lines) {
+          saveCachedLines(resp.responseText);
+          callback(lines);
+        } else {
+          callback(null);
+        }
+      },
+      onerror: function () { callback(null); },
+      ontimeout: function () { callback(null); }
+    });
   }
 
   // ── 生成解析链接 ──
   function buildParseUrl() {
     const videoUrl = encodeURIComponent(location.href);
-    if (USE_LOCAL) {
-      return `${LOCAL_PLAYER}?url=${videoUrl}&api=${encodeURIComponent(getCurrentApi())}`;
-    }
     return getCurrentApi() + videoUrl;
   }
 
   // ── 切换线路 ──
   function switchLine() {
+    if (!API_LINES.length) {
+      API_LINES = FALLBACK_LINES;
+    }
     currentIdx = (currentIdx + 1) % API_LINES.length;
     GM_setValue(STORE_KEY, currentIdx);
     updateLabel();
@@ -211,7 +305,21 @@
     setTimeout(() => el.remove(), 2100);
   }
 
-  // ── GM 菜单：切换线路 ──
+  function forceRefreshLines() {
+    fetchLatest(function (lines) {
+      if (lines) {
+        API_LINES = lines;
+        currentIdx = 0;
+        GM_setValue(STORE_KEY, currentIdx);
+        updateLabel();
+        toast('✅ 线路已更新（' + API_LINES.length + ' 条）');
+      } else {
+        toast('⚠️ 更新失败，请检查网络');
+      }
+    });
+  }
+
+  // ── GM 菜单 ──
   GM_registerMenuCommand('🔄 切换解析线路', () => {
     switchLine();
     updateLabel();
@@ -219,14 +327,26 @@
   });
 
   GM_registerMenuCommand('📋 查看当前线路', () => {
-    alert('当前: ' + getCurrentName());
+    alert('当前: ' + getCurrentName() + '\n共 ' + API_LINES.length + ' 条线路');
+  });
+
+  GM_registerMenuCommand('🔃 强制更新线路列表', () => {
+    forceRefreshLines();
   });
 
   // ── 启动 ──
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', createFloatingBtn);
-  } else {
-    createFloatingBtn();
+  function boot() {
+    loadLines(function () {
+      const saved = GM_getValue(STORE_KEY, 0);
+      currentIdx = (saved < API_LINES.length) ? saved : 0;
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', createFloatingBtn);
+      } else {
+        createFloatingBtn();
+      }
+    });
   }
+
+  boot();
 
 })();
